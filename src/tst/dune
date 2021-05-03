@@ -1,0 +1,10 @@
+(executable
+        (name runtests)
+        (libraries stdio core alcotest str)
+        (preprocess (pps ppx_sexp_conv ppx_jane)))
+
+(install
+    (section bin)    
+    (files (runtests.bc as runtests.bc) 
+           (runtests.exe as runtests)
+           ))

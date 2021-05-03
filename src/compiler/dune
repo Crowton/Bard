@@ -1,0 +1,11 @@
+(executable
+        (name tigerc)        
+        (libraries tigermain))
+
+
+(install 
+    (section bin)
+    
+    (files (tigerc.bc as tigerc.bc) 
+           (tigerc.exe as tigerc)
+           ))

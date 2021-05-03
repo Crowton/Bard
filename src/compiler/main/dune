@@ -1,0 +1,6 @@
+(library
+        (name tigermain)
+        (libraries core tigercommon tigerlexer tigerparser)
+        (preprocess (pps ppx_jane))
+        )
+

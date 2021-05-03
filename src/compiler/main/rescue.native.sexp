@@ -1,0 +1,1 @@
+(:standard -I ../../rescue/lexer/Darwin -I ../../rescue/lexer/byte -I ../../rescue/parser/Darwin -I ../../rescue/parser/byte ../../rescue/lexer/Darwin/tigerlexer__Lexer.cmx  ../../rescue/parser/Darwin/tigerparser__ParserAux.cmx ../../rescue/parser/Darwin/tigerparser__Parser.cmx )

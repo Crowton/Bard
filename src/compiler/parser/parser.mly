@@ -110,7 +110,7 @@ typ:
   | BOOL_TYPE                                                   { Bool }
   | STRING_TYPE                                                 { String }
   | UNIT_TYPE                                                   { Unit }
-  | LPAREN ty=separated_list(COMMA, typ) ARROW res=typ RPAREN   { FunType (ty, res) }
+  | LPAREN ty=separated_list(COMMA, typ) RPAREN ARROW res=typ   { FunType (ty, res) }
 
 
 (* Def for list. Type exp. Used for function calls *)

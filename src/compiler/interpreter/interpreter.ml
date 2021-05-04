@@ -94,7 +94,7 @@ let checkValueType (value: value) (typean: typean) (pos: pos) (fName: string) : 
     | None -> () (* Do nothing *)
     | Some (ty, _) ->
         let realTy = type_of_val value in
-        if realTy != ty
+        if realTy <> ty
         then raise (InterpreterError ("Type mismatch at " ^ fName ^ ". Expected "
                                       ^ string_of_typ ty ^ ", but got "
                                       ^ string_of_typ realTy ^ ".", pos))

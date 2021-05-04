@@ -1,0 +1,5 @@
+let fun f(x: Int): Int = x * 2
+    val x: (Int) => Int = f
+in
+    x(21)
+end

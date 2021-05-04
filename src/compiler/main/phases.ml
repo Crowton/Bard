@@ -1,18 +1,14 @@
 
-type phase = LEX | PAR | SEM | LLVM | X86
+type phase = LEX | PAR | EVAL
 
 let toHandle = function
 | LEX -> "lex"
 | PAR -> "par"
-| SEM -> "sem"
-| LLVM -> "llvm"
-| X86 -> "x86"
+| EVAL -> "eval"
 
 let fromHandleOpt = function
 | "lex" -> Some LEX
 | "par" -> Some PAR
-| "sem" -> Some SEM
-| "llvm" -> Some LLVM
-| "x86" -> Some X86
+| "eval" -> Some EVAL
 | _ -> None
 

@@ -1,12 +1,5 @@
-(**************************************************************************)
-(* AU Compilation. Assignment submissions must not modify this file       *)
-(* Do not distribute                                                      *)
-(**************************************************************************)
-
-
 %start <(string * Lexing.position) list> lexdriver
 %%
-(* --- lexer driver --- *)
 
 
 anytoken:

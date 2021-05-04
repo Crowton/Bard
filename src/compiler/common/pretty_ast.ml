@@ -1,6 +1,6 @@
 (** AST pretty printer implementation *)
 
-open Ast 
+open Ast
 
 
 let concat = String.concat ""

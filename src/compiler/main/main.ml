@@ -1,14 +1,9 @@
-(**************************************************************************)
-(* AU Compilation. Assignment submissions must not modify this file       *)
-(**************************************************************************)
-
-(** Tigerc compiler main *)
-
+(** Bard main *)
 
 open Tigercommon 
 open Tigerlexer
-open Tigerparser 
-(* open Tigersemant *)
+open Tigerparser
+open Interpreter
 open Phases
 open ExitCodes
 
@@ -16,7 +11,7 @@ module A = Absyn
 module A' = Tabsyn
 module S = Symbol
 
-type config = {file: string; phase: phase; normalize: bool; unfold: int; out: Format.formatter}
+type config = {file: string; phase: phase; out: Format.formatter}
 
 exception ExitMain of phase
 
@@ -30,9 +25,9 @@ let initLexer filename =
   filebuf.lex_curr_p <- { filebuf.lex_curr_p with pos_fname = filename };  
   (input, filebuf)
 
-let lexonly {file;out;_} =
+let lexonly { file; out; _ } =
   let input, filebuf = initLexer file in
-  let lexRes =   
+  let lexRes =
     try
       let tokens = Parser.lexdriver Lexer.token filebuf in
       let printToken ((t,p ):string * Lexing.position) = 
@@ -47,10 +42,10 @@ let lexonly {file;out;_} =
   in 
   close_in input; lexRes
 
-let parse {file;phase;out;normalize;_} = 
+let parse { file; phase; out; _ } = 
   let input, filebuf = initLexer file in 
   let parseRes = 
-    try  Parser.program Lexer.token filebuf
+    try Parser.program Lexer.token filebuf
     with
     | Lexer.Error msg -> Printf.eprintf "%s%!" msg; raise (ExitMain LEX)    
     | Parser.Error ->  
@@ -68,13 +63,14 @@ let parse {file;phase;out;normalize;_} =
   then Pretty_ast.print_exp out parseRes;
   parseRes
 
-(* let semant {phase;out;unfold;_} exp = 
-  let texp, err = Semant.transProg exp
-  in if Errenv.any_errors err
-  then raise (ExitMain SEM);
-  if phase = SEM
-  then Prtabsyn.print_exp unfold out texp;
-  texp *)
+let evaluate { phase; out; _ } exp =
+  let res, err = Interpreter.eval_top exp in
+  match err with
+  | Some (msg, p) -> Printf.eprintf "Exception at %d:%d: %s\n%!" p.pos_lnum (p.pos_cnum - p.pos_bol + 1) msg; raise (ExitMain EVAL)
+  | None ->
+    if phase = EVAL
+    then Format.fprintf out "Result: %s\n" (value_to_string res);
+    res
 
 
 (* Our reference compiler should allow for stopping at different phases 
@@ -90,9 +86,6 @@ let parse {file;phase;out;normalize;_} =
    invalid return from each phase *)
 let withFlags ({phase;out;_} as config) =
   let exitCode = ref 0 in
-
-  (*let stop s = raise (InvalidInput ("Invalid input: " ^ s)) in*)
-
   begin 
     try
       match phase with
@@ -101,10 +94,10 @@ let withFlags ({phase;out;_} as config) =
       | PAR ->
           let _ = parse config in
           ()
-      (* | SEM ->
+      | EVAL ->
           let exp = parse config in
-          let _ = semant config exp in
-          () *)
+          let _ = evaluate config exp in
+          ()
       |_  ->  failwith "only lexing, parsing, and semantic analysis phases are supported"
     with ExitMain p ->
            exitCode := (error_code p)
@@ -135,8 +128,8 @@ let withFlags ({phase;out;_} as config) =
              eprintf "'%s' is not a regular file.\n%!" filename;
              exit 1) in
 
-    let command = Command.basic 
-      ~summary: "Tiger AU reference compiler"
+    let command = Command.basic
+      ~summary: "Bard runtime"
       ~readme: ( fun () -> "More detailed information")
       Command.Let_syntax.(        
         let%map_open file = anon ( "filename" %: regular_file)
@@ -150,23 +143,12 @@ let withFlags ({phase;out;_} as config) =
                               | None -> eprintf "invalid phase '%s'\n%!" p
                                       ; exit 1
                     )
-        and normalize = flag ~aliases:["n"] "normalize" no_arg 
-                            ~doc:" normalize pretty printing of AST"
-        and unfold = flag ~aliases:["u"] "unfold" 
-          (optional_with_default 0 int) 
-          ~doc:"n unfold name-types n levels when printing AST"
-          |> map ~f:
-              (fun u -> 
-                if u < 0 
-                then (eprintf "argument to unfold must be non-negative\n%!"
-                      ; exit 1) 
-                else u)
         in
         fun () -> 
           let out = match out with 
           | None -> Format.std_formatter 
           | Some s -> Format.formatter_of_out_channel (Out_channel.create s) in
-          let config = {file; phase; normalize; unfold; out} in 
+          let config = { file; phase; out } in 
           withFlags config
       ) in
-    Command.run ~version: "0.05" ~build_info: "AU Tiger compiler" command 
+    Command.run ~version: "0.05" ~build_info: "Bard runtime" command 

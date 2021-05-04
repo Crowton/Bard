@@ -98,7 +98,7 @@ let withFlags ({phase;out;_} as config) =
           let exp = parse config in
           let _ = evaluate config exp in
           ()
-      |_  ->  failwith "only lexing, parsing, and semantic analysis phases are supported"
+      |_  ->  failwith "only lexing, parsing, and interpretation analysis phases are supported"
     with ExitMain p ->
            exitCode := (error_code p)
   end; 
@@ -136,8 +136,8 @@ let withFlags ({phase;out;_} as config) =
         and out = flag ~aliases:["o"] "out" 
                     (optional string) ~doc:"FILE name of output FILE"
         and phase = flag ~aliases:["p"] "phase" 
-                    (optional_with_default "sem" string)
-          ~doc:"PHASE stop compilation after PHASE:\nlex, par, sem, llvm, x86"
+                    (optional_with_default "eval" string)
+          ~doc:"PHASE stop compilation after PHASE:\nlex, par, eval"
           |> map ~f:(fun p -> match fromHandleOpt p with 
                                 Some p -> p 
                               | None -> eprintf "invalid phase '%s'\n%!" p

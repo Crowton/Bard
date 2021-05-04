@@ -2,4 +2,4 @@ BinOpExp(TimesBinOp,
   BinOpExp(TimesBinOp,
   | IntLit(3),
   | IntLit(7)),
-  IntLit(3))
+  IntLit(2))

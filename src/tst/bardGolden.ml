@@ -1,30 +1,19 @@
-(**************************************************************************)
-(* AU Compilation.                                                        *)
-(**************************************************************************)
-
 (* See comments in runtests.ml *)
 
-type runmode = Batch | Interactive (* the interactive mode is not yet supported *)
-
 type testphase 
-  = LEX | PAR | SEM | LL of runmode | X86 of runmode 
+  = LEX | PAR | EVAL
 
 let phaseName = function 
     LEX -> "Lexer" 
   | PAR -> "Parser"
-  | SEM -> "Semant"
-  | LL Batch -> "LLBatch"
-  | LL Interactive -> "LLInter"
-  | X86 Batch -> "x86Batch "
-  | X86 Interactive -> "x86Inter"
+  | EVAL -> "Interpreter"
 
 let runWithStatus cmd =
   let inp = Unix.open_process_in cmd in
   let s = Core.In_channel.input_all inp in
   Core.In_channel.close inp;
   (Unix.close_process_in inp, s)
-    
-(* attribution: https://gist.github.com/lindig/be55f453026c65e761f4e7012f8ab9b5 *) 
+
 let findByExtension ?(sort=true) dir exts =
   let isMatch f =     
     List.mem (Filename.extension f) exts in
@@ -47,8 +36,7 @@ let golden phase code out file overwrite =
   let golden_ext = match phase with 
     LEX -> ".expected-lex"
   | PAR -> ".expected-par" 
-  | SEM -> ".expected-sem"
-  | _ ->   ".expected-out" in
+  | EVAL -> ".expected-res" in
   let golden_file = file ^ golden_ext in
   match code, Sys.file_exists golden_file, overwrite with
   | 0, false, _ | 0, true, true ->
@@ -67,13 +55,13 @@ let golden phase code out file overwrite =
  
 let phaseFlag phase = "-p " ^ 
   match phase with 
-   LEX -> "lex"|PAR ->"par"|SEM->"sem"|LL _ ->"llvm" |X86 _ ->"x86"
+   LEX -> "lex" | PAR -> "par" | EVAL -> "eval"
    
 
 (* observe that if the exit code is non-zero we make no further checks *)  
 let goldenWithExitCode expectedExitCode phase overwrite file () = 
-  let flag = " " ^ phaseFlag phase in     
-  let status,out = runWithStatus @@"./testwrap.sh " ^ file ^ flag ^ " -normalize" in 
+  let flag = " " ^ phaseFlag phase in
+  let status, out = runWithStatus @@"./testwrap.sh " ^ file ^ flag in 
   match status with 
   | Unix.WEXITED 0 when expectedExitCode = 0  ->
       golden phase 0 out file overwrite   (* only check the output on 0-exit *)

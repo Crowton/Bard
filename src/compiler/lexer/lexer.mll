@@ -26,7 +26,7 @@ let invalidIdn = digit idnEnd
 let notQuoteBackslash = [' '-'!' '#'-'[' ']'-'~']
 
 rule token = parse
-  [' ' '\t' ]         { token lexbuf }     (* skip blanks *)
+  [' ' '\t' '\r' ]         { token lexbuf }     (* skip blanks *)
 | '\n'                { Lexing.new_line lexbuf; token lexbuf }
 | "/*"                { comment 0 lexbuf }
 | ','                 { COMMA }
@@ -62,6 +62,11 @@ rule token = parse
 | "true"              { TRUE }
 | "false"             { FALSE }
 | '\"'                { string_parse "" lexbuf }
+| "Int"               { INT_TYPE}
+| "Bool"              { BOOL_TYPE}
+| "String"            { STRING_TYPE}
+| "Unit"              { UNIT_TYPE}
+| "=>"                { ARROW }
 | idn as s            { ID s }
 | invalidIdn as s     { error lexbuf ("Invalid identifier '" ^ s ^ "'. Cannot start with a number.") }
 | _ as t              { error lexbuf ("Invalid character '" ^ (String.make 1 t) ^ "'") }
@@ -81,23 +86,3 @@ and string_parse acc = parse
 | notQuoteBackslash* as s      { string_parse (acc ^ s) lexbuf }
 | _ as t                       { error lexbuf ("Invalid character in string '" ^ (String.make 1 t) ^ "'") }
 | eof                          { error lexbuf ("EOF found while lexing string") }
-
-(* | '\\'                         { string_parse_skip acc lexbuf }
-| "\\\\"                       { string_parse (acc ^ "\\") lexbuf }
-| "\\n"                        { string_parse (acc ^ "\n") lexbuf }
-| "\\t"                        { string_parse (acc ^ "\t") lexbuf }
-| "\\\""                       { string_parse (acc ^ "\"") lexbuf }
-| "\\^?"                       { string_parse (acc ^ "\127") lexbuf }
-| "\\^" (['@' - '_'] as s)     { string_parse (acc ^ String.make 1 (Char.chr (Char.code s - 64))) lexbuf }
-| "\\^" (['a' - 'z'] as s)     { string_parse (acc ^ String.make 1 (Char.chr (Char.code s - 96))) lexbuf }
-| "\\^" (_ as s)               { error lexbuf ("Invalid escape character in string '" ^ (String.make 1 s) ^ "'") }
-| "\\" (digit3 as s)           { if int_of_string s < 256 then string_parse (acc ^ String.make 1 (Char.chr (int_of_string s))) lexbuf 
-                                                          else error lexbuf ("Invalid escape number in string '" ^ s ^ "'") } *)
-
-
-(* and string_parse_skip acc = parse
-  '\\'                         { string_parse acc lexbuf }
-| '\n'                         { Lexing.new_line lexbuf; string_parse_skip acc lexbuf }
-| [' ' '\t' '\012']            { string_parse_skip acc lexbuf}
-| _ as t                       { error lexbuf ("Invalid character in escaped string '" ^ (String.make 1 t) ^ "'") }
-| eof                          { error lexbuf ("EOF found while lexing string") } *)

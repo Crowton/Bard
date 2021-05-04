@@ -1,0 +1,5 @@
+let fun f(x) = x + 1
+	fun g(y) = f(y * 2)
+in
+	g(2)
+end

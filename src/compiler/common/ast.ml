@@ -2,12 +2,19 @@ type pos = Lexing.position
 
 type binOp
   = PlusBinOp | MinusBinOp | TimesBinOp | DivideBinOp
-  | LtBinOp | LeBinOp | EqBinOp | NeqBinOp | GtBinOp | GeBinOp
+  | LtBinOp | LeBinOp | GtBinOp | GeBinOp | EqBinOp | NeqBinOp
   | AndBinOp | OrBinOp
   | ConcatBinOp
 
 type unOp
   = NegUnOp | NotUnOp 
+
+type typ
+  = Int | Bool | String | Unit
+  | FunType of (typ list) * typ
+
+type typean
+  = (typ * pos) option
 
 type exp
   = IntLit of int
@@ -23,16 +30,16 @@ and decl
   = FunDec of fundecldata list 
   | ValDec of 
       { name: string
-      ; typ: (string * pos) option
+      ; typean: typean
       ; init: exp
       ; pos: pos 
       }
 and fundecldata = Fdecl of   
       { name: string
       ; params: fielddata list
-      ; result: (string * pos) option
+      ; result: typean
       ; body: exp
       ; pos: pos 
       }
 and fielddata = 
-    Field of { name: string; typ: (string * pos) option; pos: pos }
+    Field of { name: string; typean: typean; pos: pos }

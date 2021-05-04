@@ -1,9 +1,3 @@
-(**************************************************************************)
-(* AU compilation.                                                        *)
-(* Skeleton file -- expected to be modified as part of the assignment     *)
-(* Do not distribute                                                      *)
-(**************************************************************************)
-
 %{
   open Tigercommon.Ast
 %}
@@ -21,6 +15,7 @@
 %token CARET
 %token IF THEN ELSE
 %token LET IN END VAL FUN EQ
+%token INT_TYPE, BOOL_TYPE, STRING_TYPE, UNIT_TYPE, ARROW
 
 
 (* Handle lists in list, to have have precedence for lowest level *)
@@ -71,6 +66,7 @@ exp:
   | IF t=exp THEN e1=exp                         { IfExp { test=t; thn=e1; els=None; pos=$startpos } }
   | IF t=exp THEN e1=exp ELSE e2=exp             { IfExp { test=t; thn=e1; els=Some e2; pos=$startpos } }
   | LET d=list(decl) IN e=exp END                { LetExp { decls=d; body=e; pos=$startpos } }
+  /* | f=exp LPAREN a=separated_list(COMMA, exp) RPAREN    { CallExp { func=f; args=a; pos=$startpos } } */
   | f=exp LPAREN RPAREN                          { CallExp { func=f; args=[]; pos=$startpos } }
   | f=exp LPAREN a=argslist RPAREN               { CallExp { func=f; args=a; pos=$startpos } }
 %inline op:
@@ -91,8 +87,8 @@ exp:
 (* Rules for decls. Made to parse list of decls, in arbitary order *)
 decl:
   | fd=fundecllist                       { FunDec fd }
-  | VAL id=ID EQ e=exp                   { ValDec { name=id; typ=None; init=e; pos=$startpos } }
-  | VAL id=ID COLON typ=ID EQ e=exp      { ValDec { name=id; typ=Some(typ, $startpos(typ)); init=e; pos=$startpos } }
+  | VAL id=ID EQ e=exp                   { ValDec { name=id; typean=None; init=e; pos=$startpos } }
+  | VAL id=ID COLON typ=typ EQ e=exp     { ValDec { name=id; typean=Some(typ, $startpos(typ)); init=e; pos=$startpos } }
 
 (* Def for nonempty list. Type fundecldata. *)
 fundecllist:
@@ -101,13 +97,21 @@ fundecllist:
 
 (* The function delcs. Rules for explicit type and no type *)
 fundecldata:
-  | FUN id=ID LPAREN tyf=separated_list(COMMA, tyfield) RPAREN EQ e=exp               { Fdecl { name=id; params=tyf; result=None; body=e; pos=$startpos } }
-  | FUN id=ID LPAREN tyf=separated_list(COMMA, tyfield) RPAREN COLON typ=ID EQ e=exp  { Fdecl { name=id; params=tyf; result=Some(typ, $startpos(typ)); body=e; pos=$startpos } }
+  | FUN id=ID LPAREN tyf=separated_list(COMMA, tyfield) RPAREN EQ e=exp                { Fdecl { name=id; params=tyf; result=None; body=e; pos=$startpos } }
+  | FUN id=ID LPAREN tyf=separated_list(COMMA, tyfield) RPAREN COLON typ=typ EQ e=exp  { Fdecl { name=id; params=tyf; result=Some(typ, $startpos(typ)); body=e; pos=$startpos } }
 
 (* A type field *)
 tyfield:
-  | id=ID                { Field { name=id; typ=None; pos=$startpos }  }
-  | id=ID COLON tyid=ID  { Field { name=id; typ=Some(tyid, $startpos(tyid)); pos=$startpos }  }
+  | id=ID                 { Field { name=id; typean=None; pos=$startpos }  }
+  | id=ID COLON ty=typ    { Field { name=id; typean=Some(ty, $startpos(ty)); pos=$startpos }  }
+
+typ:
+  | INT_TYPE                                                    { Int }
+  | BOOL_TYPE                                                   { Bool }
+  | STRING_TYPE                                                 { String }
+  | UNIT_TYPE                                                   { Unit }
+  | LPAREN ty=separated_list(COMMA, typ) ARROW res=typ RPAREN   { FunType (ty, res) }
+
 
 (* Def for list. Type exp. Used for function calls *)
 argslist:

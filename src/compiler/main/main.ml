@@ -64,8 +64,8 @@ let parse {file;phase;out;normalize;_} =
       raise (ExitMain PAR)        
   in 
   close_in input;
-  (* if phase = PAR
-  then Prabsyn.print_exp out parseRes; *)
+  if phase = PAR
+  then Pretty_ast.print_exp out parseRes;
   parseRes
 
 (* let semant {phase;out;unfold;_} exp = 

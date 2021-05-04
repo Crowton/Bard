@@ -1,0 +1,5 @@
+BinOpExp(PlusBinOp,
+  IntLit(2),
+  BinOpExp(TimesBinOp,
+  | IntLit(20),
+  | IntLit(2)))

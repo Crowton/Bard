@@ -1,0 +1,14 @@
+1:1:LET
+1:5:VAL
+1:9:ID x
+1:11:EQ
+1:13:INT 21
+2:2:VAL
+2:6:ID y
+2:8:EQ
+2:10:INT 2
+3:1:IN
+4:2:ID x
+4:4:TIMES
+4:6:ID y
+5:1:END

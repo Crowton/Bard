@@ -1,0 +1,8 @@
+LetExp([
+  VarDec(x, NO_TY,
+  | IntLit(21)),
+  VarDec(y, NO_TY,
+  | IntLit(2))],
+  BinOpExp(TimesBinOp,
+  | VarExp(x),
+  | VarExp(y)))

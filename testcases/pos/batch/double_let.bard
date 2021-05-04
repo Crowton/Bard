@@ -1,0 +1,5 @@
+let val x = 21
+	val y = 2
+in
+	x * y
+end

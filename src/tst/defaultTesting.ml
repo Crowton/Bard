@@ -6,12 +6,12 @@
 
 open TigerGolden
 
-let findTigs = (Core.Fn.flip findByExtension) [".tig"]
-let neg_lex = findTigs "testcases/neg/lex" 
-let neg_par = findTigs "testcases/neg/par" 
+let findBards = (Core.Fn.flip findByExtension) [".bard"]
+let neg_lex = findBards "testcases/neg/lex" 
+let neg_par = findBards "testcases/neg/par" 
 (* let neg_sem = findTigs "testcases/neg/sem" *)
-let pos_batch = findTigs "testcases/pos/batch"
-let pos_io = findTigs "testcases/pos/interactive"
+let pos_batch = findBards "testcases/pos/batch"
+let pos_io = findBards "testcases/pos/interactive"
 
 
 let posTests = function 

@@ -148,14 +148,14 @@ let rec eval (exp: exp) (env: env) : value = match exp with
       )
 
   | IfExp { test: exp; thn: exp; els: exp option; pos: pos } ->
-      (match eval exp env with
+      (match eval test env with
         | BoolVal true -> eval thn env
         | BoolVal false ->
             (match els with
               | None -> UnitVal
-              | Some els -> eval els env
+              | Some el -> eval el env
             )
-        | v -> raise (InterpreterError ("Type mismatch at If condition. Expected Bool, but got " ^ type_string_of_value v ^ ".", pos))
+        | v -> raise (InterpreterError ("Type mismatch at if condition. Expected Bool, but got " ^ type_string_of_value v ^ ".", pos))
       )
 
   | CallExp { func: exp; args: (exp * pos) list; pos: pos } ->

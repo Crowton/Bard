@@ -1,0 +1,8 @@
+LetExp([
+  FunctionDec[
+  | (f,[
+  |   (x, NO_TY)],
+  |   NO_TY,
+  |   VarExp(x))]],
+  CallExp(
+  | VarExp(f),[])

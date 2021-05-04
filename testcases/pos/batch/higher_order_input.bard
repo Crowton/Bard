@@ -1,0 +1,5 @@
+let fun apply(f, x) = f(x)
+    fun g(i) = i + 1
+in
+    apply(g, 41)
+end

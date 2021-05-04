@@ -1,0 +1,3 @@
+CallExp(
+  IntLit(1),[
+  IntLit(0)]

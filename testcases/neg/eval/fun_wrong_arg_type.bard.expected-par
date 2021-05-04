@@ -1,0 +1,9 @@
+LetExp([
+  FunctionDec[
+  | (f,[
+  |   (x, Int)],
+  |   NO_TY,
+  |   VarExp(x))]],
+  CallExp(
+  | VarExp(f),[
+  | BoolLit(true)])

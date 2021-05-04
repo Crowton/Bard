@@ -1,0 +1,2 @@
+UnOpExp(NegUnOp,
+  StringLit("hello World"))

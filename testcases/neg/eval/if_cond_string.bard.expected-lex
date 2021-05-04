@@ -1,0 +1,4 @@
+1:1:IF
+1:8:STRING "ged"
+1:10:THEN
+1:15:INT 42

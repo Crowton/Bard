@@ -1,0 +1,4 @@
+LetExp([
+  VarDec(x, Int,
+  | BoolLit(true))],
+  VarExp(x))

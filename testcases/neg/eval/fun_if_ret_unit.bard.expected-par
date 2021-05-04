@@ -1,0 +1,13 @@
+LetExp([
+  FunctionDec[
+  | (f,[
+  |   (x, Int)],
+  |   Bool,
+  |   IfExp(
+  |   | BinOpExp(EqBinOp,
+  |   |   VarExp(x),
+  |   |   IntLit(42)),
+  |   | BoolLit(true)))]],
+  CallExp(
+  | VarExp(f),[
+  | IntLit(10)])

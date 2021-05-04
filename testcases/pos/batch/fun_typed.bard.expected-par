@@ -1,0 +1,11 @@
+LetExp([
+  FunctionDec[
+  | (good_number,[
+  |   (x, Int)],
+  |   Bool,
+  |   BinOpExp(EqBinOp,
+  |   | VarExp(x),
+  |   | IntLit(42)))]],
+  CallExp(
+  | VarExp(good_number),[
+  | IntLit(20)])

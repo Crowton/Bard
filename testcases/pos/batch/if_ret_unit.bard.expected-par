@@ -1,0 +1,6 @@
+LetExp([
+  VarDec(x, Unit,
+  | IfExp(
+  |   BoolLit(false),
+  |   IntLit(42)))],
+  VarExp(x))

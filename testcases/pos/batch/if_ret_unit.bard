@@ -1,0 +1,4 @@
+let val x: Unit = if false then 42
+in
+    x
+end

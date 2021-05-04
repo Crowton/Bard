@@ -1,0 +1,5 @@
+let fun good_number(x: Int): Bool =
+        x == 42
+in
+    good_number(20)
+end

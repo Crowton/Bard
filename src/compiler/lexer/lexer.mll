@@ -41,7 +41,7 @@ rule token = parse
 | "<="                { LE }
 | '>'                 { GT }
 | ">="                { GE }
-| "=="                { EQ }
+| "=="                { EEQ }
 | "!="                { NEQ }
 | '&'                 { AND }
 | '|'                 { OR }

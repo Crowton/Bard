@@ -1,0 +1,5 @@
+let fun f(x: Int): Bool =
+        if x == 42 then true
+in
+    f(10)
+end

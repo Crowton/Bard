@@ -1,0 +1,3 @@
+BinOpExp(GeBinOp,
+  StringLit("hello"),
+  StringLit("world!"))

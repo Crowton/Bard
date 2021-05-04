@@ -1,0 +1,2 @@
+let val x: Int = true
+in x end

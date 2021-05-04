@@ -1,0 +1,15 @@
+LetExp([
+  FunctionDec[
+  | (g,[
+  |   (i, NO_TY)],
+  |   NO_TY,
+  |   BinOpExp(PlusBinOp,
+  |   | VarExp(i),
+  |   | IntLit(1))),
+  | (f,[],
+  |   NO_TY,
+  |   VarExp(g))]],
+  CallExp(
+  | CallExp(
+  |   VarExp(f),[],[
+  | IntLit(41)])

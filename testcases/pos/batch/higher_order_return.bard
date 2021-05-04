@@ -1,0 +1,5 @@
+let fun g(i) = i + 1
+    fun f() = g
+in
+    f()(41)
+end

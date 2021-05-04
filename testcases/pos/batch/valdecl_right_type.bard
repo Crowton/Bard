@@ -1,0 +1,2 @@
+let val x: Int = 42
+in x end

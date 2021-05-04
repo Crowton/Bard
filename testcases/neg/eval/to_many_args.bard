@@ -1,0 +1,2 @@
+let fun f(x) = x
+in f(1, 2) end

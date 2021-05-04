@@ -1,0 +1,3 @@
+BinOpExp(DivideBinOp,
+  IntLit(1),
+  IntLit(0))

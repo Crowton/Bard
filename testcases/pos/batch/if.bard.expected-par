@@ -1,0 +1,5 @@
+IfExp(
+  BoolLit(true),
+  IntLit(42),
+  UnOpExp(NegUnOp,
+  | IntLit(1)))

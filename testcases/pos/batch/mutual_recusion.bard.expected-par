@@ -1,0 +1,31 @@
+LetExp([
+  FunctionDec[
+  | (even,[
+  |   (n, NO_TY)],
+  |   NO_TY,
+  |   IfExp(
+  |   | BinOpExp(EqBinOp,
+  |   |   VarExp(n),
+  |   |   IntLit(0)),
+  |   | BoolLit(true),
+  |   | CallExp(
+  |   |   VarExp(odd),[
+  |   |   BinOpExp(MinusBinOp,
+  |   |   | VarExp(n),
+  |   |   | IntLit(1))])),
+  | (odd,[
+  |   (n, NO_TY)],
+  |   NO_TY,
+  |   IfExp(
+  |   | BinOpExp(EqBinOp,
+  |   |   VarExp(n),
+  |   |   IntLit(0)),
+  |   | BoolLit(false),
+  |   | CallExp(
+  |   |   VarExp(even),[
+  |   |   BinOpExp(MinusBinOp,
+  |   |   | VarExp(n),
+  |   |   | IntLit(1))]))]],
+  CallExp(
+  | VarExp(even),[
+  | IntLit(10)])

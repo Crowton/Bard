@@ -19,8 +19,8 @@
 
 (* Lists in lists for functions decls and general decls error.
    Precedence to the inner list - i.e. all functions in the same list *)
-%nonassoc FUN
 %nonassoc fun_list_base
+%nonassoc FUN
 
 (* Handles if followed by binary exp and dangleling else *)
 %nonassoc THEN

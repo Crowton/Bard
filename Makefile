@@ -2,10 +2,10 @@
 BUILD=dune build
 
 native:
-	$(BUILD) _build/install/default/bin/tigerc
+	$(BUILD) _build/install/default/bin/bard
 
 bytecode:
-	$(BUILD) _build/install/default/bin/tigerc.bc
+	$(BUILD) _build/install/default/bin/bard.bc
 
 all:
 	$(BUILD)

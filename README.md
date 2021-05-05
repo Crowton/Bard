@@ -1,4 +1,4 @@
-# AU Compilation student project template
+# Bard runtime
 
 ## Installation
 
@@ -9,10 +9,9 @@
 
 ## Using custom utop
 
-Run `make utop` to start a custom ocaml utop that loads the libraries defined in this directory. Note that we pass a custom .ocamlinit file that additionally open the Tigerc_lib module -- this makes the various custom modules, e.g., Symbol, immediately accussible through the utop.
+Run `make utop` to start a custom ocaml utop that loads the libraries defined in this directory.
 
 
 ## Notes on usage
 
 We use opam and dune package managers. See their respective home pages for more information. The Makefile also contains an option for reporting missing dependencies and clearing the source tree.
-# Bard

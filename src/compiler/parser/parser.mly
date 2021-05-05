@@ -1,5 +1,5 @@
 %{
-  open Tigercommon.Ast
+  open Bardcommon.Ast
 %}
 
 %token EOF
@@ -29,26 +29,18 @@
 %nonassoc THEN
 %nonassoc ELSE
 
-(* Handles assign followed by binary exp *)
-/* %nonassoc ASSIGN */
-
-(* Handles array creation and lookup creation,
-   such that creation is allowed *)
-/* %nonassoc ID
-%nonassoc LBRACK
-%nonassoc OF */
 
 (* Precedence and associativity of arithmetics *)
 %left OR
 %left AND
-%nonassoc LT LE GT GE EEQ NEQ
-%nonassoc NOT
+%nonassoc EEQ NEQ
+%nonassoc LT LE GT GE
+%right CARET
 %left PLUS MINUS
 %left TIMES DIVIDE
-%nonassoc unary_minus
-%right CARET
+%nonassoc unary_minus NOT
 
-%start <Tigercommon.Ast.exp> program  
+%start <Bardcommon.Ast.exp> program  
 (* Observe that we need to use fully qualified types for the start symbol *)
 
 %%

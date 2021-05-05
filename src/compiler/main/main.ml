@@ -1,19 +1,19 @@
 (** Bard main *)
 
-open Tigercommon 
-open Tigerlexer
-open Tigerparser
-open Interpreter
+open Bardcommon
+open Bardlexer
+open Bardparser
+open Bardinterpreter
+
 open Phases
 open ExitCodes
 
-module A = Absyn
-module A' = Tabsyn
-module S = Symbol
 
-type config = {file: string; phase: phase; out: Format.formatter}
+type config = { file: string; phase: phase; out: Format.formatter }
 
 exception ExitMain of phase
+
+
 
 (** Open the file and initialize the lexer buffer. Observe that the input 
     buffer must be closed by the caller. *)
@@ -56,7 +56,7 @@ let parse { file; phase; out; _ } =
         pos1.pos_fname pos1.pos_lnum (pos1.pos_cnum - pos1.pos_bol)
         pos2.pos_lnum (pos2.pos_cnum - pos2.pos_bol + 1)
         lexeme;
-      raise (ExitMain PAR)        
+      raise (ExitMain PAR)
   in 
   close_in input;
   if phase = PAR
@@ -69,7 +69,7 @@ let evaluate { phase; out; _ } exp =
   | Some (msg, p) -> Printf.eprintf "Exception at %d:%d: %s\n%!" p.pos_lnum (p.pos_cnum - p.pos_bol + 1) msg; raise (ExitMain EVAL)
   | None ->
     if phase = EVAL
-    then Format.fprintf out "Result: %s\n" (value_to_string res);
+    then Format.fprintf out "Result: %s\n" (Interpreter.value_to_string res);
     res
 
 
@@ -98,7 +98,6 @@ let withFlags ({phase;out;_} as config) =
           let exp = parse config in
           let _ = evaluate config exp in
           ()
-      |_  ->  failwith "only lexing, parsing, and interpretation analysis phases are supported"
     with ExitMain p ->
            exitCode := (error_code p)
   end; 

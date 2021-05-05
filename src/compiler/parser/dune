@@ -1,6 +1,6 @@
 (library
-        (name tigerparser)
-        (libraries tigercommon)
+        (name bardparser)
+        (libraries bardcommon)
         )
 
 (menhir

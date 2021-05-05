@@ -1,5 +1,6 @@
-open Tigercommon.Ast
-open Tigercommon.Pretty_ast
+open Bardcommon
+open Ast
+open Pretty_ast
 
 module S = Map.Make(String)
 
@@ -118,6 +119,7 @@ let rec eval (exp: exp) (env: env) : value = match exp with
         | None -> raise (InterpreterError ("Unbound Identifier " ^ x, p))
         | Some v -> v
       )
+  
   | BinOpExp { left: exp; oper: binOp; right: exp; pos: pos } ->
       let leftVal = eval left env in
       let rightVal = eval right env in
@@ -135,7 +137,7 @@ let rec eval (exp: exp) (env: env) : value = match exp with
         | GtBinOp -> int_bool_eval (>) "Greater"
         | GeBinOp -> int_bool_eval (>=) "Greater equals"
         | EqBinOp -> int_bool_eval (=) "Equals"
-        | NeqBinOp -> int_bool_eval (!=) "Not equals"
+        | NeqBinOp -> int_bool_eval (<>) "Not equals"
         | AndBinOp -> bool_eval (&&) "And"
         | OrBinOp -> bool_eval (||) "Or"
         | ConcatBinOp -> string_eval (^) "Concatenation"
@@ -146,7 +148,7 @@ let rec eval (exp: exp) (env: env) : value = match exp with
         | NegUnOp -> eval_unop_int expVal pos (~-) "Negation"
         | NotUnOp -> eval_unop_bool expVal pos (not) "Not"
       )
-
+  
   | IfExp { test: exp; thn: exp; els: exp option; pos: pos } ->
       (match eval test env with
         | BoolVal true -> eval thn env
@@ -178,10 +180,11 @@ let rec eval (exp: exp) (env: env) : value = match exp with
         | v -> raise (InterpreterError ("Calling non function type " ^ type_string_of_value v ^ ".", pos))
       )
 
-  | LetExp { decls: decl list; body: exp; pos: pos } ->
+  | LetExp { decls: decl list; body: exp; _ } ->
       let env' = decls |> List.fold_left (fun env decl -> eval_decl decl env) env in
       eval body env'
 
+(* Eval and update enviroment *)
 and eval_decl (decl: decl) (env: env) : env = match decl with
   | FunDec defs ->
       bindDefs defs env
@@ -191,6 +194,9 @@ and eval_decl (decl: decl) (env: env) : env = match decl with
       S.add name res env
 
 
+(* Main run function.
+   Initiate with empty enviroment.
+   Catch errors and propegate to Main program *)
 let eval_top exp =
   try (eval exp S.empty, None)
   with

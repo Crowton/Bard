@@ -1,11 +1,5 @@
-(**************************************************************************)
-(* AU compilation.                                                        *)
-(* Skeleton file -- expected to be modified as part of the assignment     *)
-(* Do not distribute                                                      *)
-(**************************************************************************)
-
 {
-  open Tigerparser.Parser
+  open Bardparser.Parser
   exception Error of string
   let error lexbuf msg =
     let position = Lexing.lexeme_start_p lexbuf in
@@ -26,7 +20,7 @@ let invalidIdn = digit idnEnd
 let notQuoteBackslash = [' '-'!' '#'-'[' ']'-'~']
 
 rule token = parse
-  [' ' '\t' '\r' ]         { token lexbuf }     (* skip blanks *)
+  [' ' '\t' '\r' ]    { token lexbuf }     (* skip blanks *)
 | '\n'                { Lexing.new_line lexbuf; token lexbuf }
 | "/*"                { comment 0 lexbuf }
 | ','                 { COMMA }

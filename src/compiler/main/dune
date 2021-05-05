@@ -1,6 +1,5 @@
 (library
-        (name tigermain)
-        (libraries core tigercommon tigerlexer tigerparser interpreter)
+        (name bardmain)
+        (libraries core bardcommon bardlexer bardparser bardinterpreter)
         (preprocess (pps ppx_jane))
         )
-

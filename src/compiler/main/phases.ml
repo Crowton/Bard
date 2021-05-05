@@ -1,4 +1,3 @@
-
 type phase = LEX | PAR | EVAL
 
 let toHandle = function
@@ -11,4 +10,3 @@ let fromHandleOpt = function
 | "par" -> Some PAR
 | "eval" -> Some EVAL
 | _ -> None
-

@@ -130,7 +130,7 @@ let () =
         else argv1, defaults {options with use_filter = None}
   in
   (try
-    Alcotest.run ~and_exit:false ~argv: argv2 "Tiger compiler" tests
+    Alcotest.run ~and_exit:false ~argv: argv2 "Bard runtime" tests
   with
   | _  -> ());
   let diff_file= "_build/_tests/diff-recent.html" in

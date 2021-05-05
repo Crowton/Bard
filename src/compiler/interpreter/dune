@@ -1,4 +1,4 @@
 (library
-        (name interpreter)
-        (libraries tigercommon)
+        (name bardinterpreter)
+        (libraries bardcommon)
         )

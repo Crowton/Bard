@@ -1,11 +1,11 @@
 (executable
-        (name tigerc)        
-        (libraries tigermain))
+        (name bard)        
+        (libraries bardmain))
 
 
 (install 
     (section bin)
     
-    (files (tigerc.bc as tigerc.bc) 
-           (tigerc.exe as tigerc)
+    (files (bard.bc as bard.bc) 
+           (bard.exe as bard)
            ))

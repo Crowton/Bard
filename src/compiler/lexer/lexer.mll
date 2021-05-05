@@ -39,7 +39,7 @@ rule token = parse
 | "!="                { NEQ }
 | '&'                 { AND }
 | '|'                 { OR }
-| '!'                 { NOT }
+| '~'                 { NOT }
 | '^'                 { CARET }
 | "let"               { LET }
 | "val"               { VAL }

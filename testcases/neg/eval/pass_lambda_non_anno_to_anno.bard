@@ -1,0 +1,5 @@
+let fun apply(f: (Int) => Int, x: Int): Int = f(x)
+    fun g(y) = y + 1
+in
+    apply(g, 41)
+end

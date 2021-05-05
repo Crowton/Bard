@@ -17,18 +17,14 @@
 %token LET IN END VAL FUN EQ
 %token INT_TYPE, BOOL_TYPE, STRING_TYPE, UNIT_TYPE, ARROW
 
+(* Lists in lists for functions decls and general decls error.
+   Precedence to the inner list - i.e. all functions in the same list *)
+%nonassoc FUN
+%nonassoc fun_list_base
 
-(* Handle lists in list, to have have precedence for lowest level *)
-/* %nonassoc list_base */
-
-(* Handles the nested list cases for function and type decls *)
-/* %nonassoc FUN */
-
-(* Handles if followed by binary exp
-   and dangleling else *)
+(* Handles if followed by binary exp and dangleling else *)
 %nonassoc THEN
 %nonassoc ELSE
-
 
 (* Precedence and associativity of arithmetics *)
 %left OR
@@ -39,6 +35,9 @@
 %left PLUS MINUS
 %left TIMES DIVIDE
 %nonassoc unary_minus NOT
+
+(* Function calls *)
+%nonassoc LPAREN
 
 %start <Bardcommon.Ast.exp> program  
 (* Observe that we need to use fully qualified types for the start symbol *)
@@ -58,7 +57,6 @@ exp:
   | IF t=exp THEN e1=exp                         { IfExp { test=t; thn=e1; els=None; pos=$startpos } }
   | IF t=exp THEN e1=exp ELSE e2=exp             { IfExp { test=t; thn=e1; els=Some e2; pos=$startpos } }
   | LET d=list(decl) IN e=exp END                { LetExp { decls=d; body=e; pos=$startpos } }
-  /* | f=exp LPAREN a=separated_list(COMMA, exp) RPAREN    { CallExp { func=f; args=a; pos=$startpos } } */
   | f=exp LPAREN RPAREN                          { CallExp { func=f; args=[]; pos=$startpos } }
   | f=exp LPAREN a=argslist RPAREN               { CallExp { func=f; args=a; pos=$startpos } }
 %inline op:
@@ -84,7 +82,7 @@ decl:
 
 (* Def for nonempty list. Type fundecldata. *)
 fundecllist:
-  | n = fundecldata                  { [n] }    /*%prec list_base*/
+  | n = fundecldata                  { [n] }       %prec fun_list_base
   | h = fundecldata t = fundecllist  { h :: t }
 
 (* The function delcs. Rules for explicit type and no type *)

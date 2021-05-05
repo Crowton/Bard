@@ -27,6 +27,3 @@ report-missing-deps:
 
 utop:
 	dune utop . -- -init=./.ocamlinit
-	
-zip-compiler:
-	(cd src; zip -FSr ../compiler.zip compiler)

@@ -6,5 +6,5 @@
 (menhir
   (merge_into parser)
   (modules parser lexdriver)
-  (flags --explain)
+  (flags --strict --explain)
 )

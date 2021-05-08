@@ -180,6 +180,9 @@ let rec eval (exp: exp) (env: env) : value = match exp with
         | v -> raise (InterpreterError ("Calling non function type " ^ type_string_of_value v ^ ".", pos))
       )
 
+  | LambdaExp { params: fielddata list ; body: exp ; _ } ->
+      ClosureVal { params=params; restyp=None; body=body; env=env; defs=[] }
+
   | LetExp { decls: decl list; body: exp; _ } ->
       let env' = decls |> List.fold_left (fun env decl -> eval_decl decl env) env in
       eval body env'

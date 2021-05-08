@@ -1,0 +1,4 @@
+LambdaExp([
+  (n, NO_TY)],   BinOpExp(PlusBinOp,
+  | VarExp(n),
+  | IntLit(1)))

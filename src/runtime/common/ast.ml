@@ -26,8 +26,9 @@ type exp
   | VarExp of id * pos
   | BinOpExp of { left: exp; oper: binOp; right: exp; pos: pos }
   | UnOpExp of { oper: unOp; exp: exp; pos: pos }
-  | IfExp of { test: exp; thn: exp; els: exp option; pos: pos }  
-  | CallExp of { func: exp; args: (exp * pos) list; pos: pos }   
+  | IfExp of { test: exp; thn: exp; els: exp option; pos: pos }
+  | CallExp of { func: exp; args: (exp * pos) list; pos: pos }
+  | LambdaExp of { params: fielddata list ; body: exp ; pos: pos }
   | LetExp of { decls: decl list; body: exp; pos: pos }
 and decl
   = FunDec of fundecldata list
@@ -35,7 +36,7 @@ and decl
       { name: id
       ; typean: typean
       ; init: exp
-      ; pos: pos 
+      ; pos: pos
       }
 and fundecldata = Fdecl of
       { name: id

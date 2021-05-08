@@ -1,0 +1,4 @@
+LetExp([
+  VarDec(x, NO_TY,
+  | IntLit(42))],
+  VarExp(x))

@@ -26,6 +26,14 @@
 %nonassoc THEN
 %nonassoc ELSE
 
+(* Handle lambda creation *)
+%nonassoc single_lambda
+%nonassoc lambda
+
+(* Handle id in paren *)
+%nonassoc ID
+%nonassoc RPAREN
+
 (* Precedence and associativity of arithmetics *)
 %left OR
 %left AND
@@ -46,19 +54,22 @@
 (* Expressions *)
 exp:
   | LPAREN e=exp RPAREN                          { e }
+  | LPAREN x=ID RPAREN                           { VarExp (x, $startpos) }
   | i=INT                                        { IntLit i }
   | TRUE                                         { BoolLit true }
   | FALSE                                        { BoolLit false }
   | s=STRING                                     { StringLit (s, $startpos) }
-  | l=ID                                         { VarExp (l, $startpos) }
-  | MINUS e=exp                                  { UnOpExp { oper=NegUnOp; exp=e; pos=$startpos } } %prec unary_minus
+  | x=ID                                         { VarExp (x, $startpos) }
+  | MINUS e=exp                                  { UnOpExp { oper=NegUnOp; exp=e; pos=$startpos } }  %prec unary_minus
   | NOT e=exp                                    { UnOpExp { oper=NotUnOp; exp=e; pos=$startpos } }
   | e1=exp o=op e2=exp                           { BinOpExp { left=e1; oper=o; right=e2; pos=$startpos } }
   | IF t=exp THEN e1=exp                         { IfExp { test=t; thn=e1; els=None; pos=$startpos } }
   | IF t=exp THEN e1=exp ELSE e2=exp             { IfExp { test=t; thn=e1; els=Some e2; pos=$startpos } }
-  | LET d=list(decl) IN e=exp END                { LetExp { decls=d; body=e; pos=$startpos } }
   | f=exp LPAREN RPAREN                          { CallExp { func=f; args=[]; pos=$startpos } }
   | f=exp LPAREN a=argslist RPAREN               { CallExp { func=f; args=a; pos=$startpos } }
+  | LPAREN par=separated_list(COMMA, tyfield) RPAREN ARROW body=exp     { LambdaExp {params=par; body=body ; pos=$startpos } }  %prec lambda
+  | LPAREN x=ID RPAREN ARROW body=exp            { LambdaExp {params=[Field { name=x; typean=None; pos=$startpos(x) }]; body=body ; pos=$startpos } }  %prec single_lambda
+  | LET d=list(decl) IN e=exp END                { LetExp { decls=d; body=e; pos=$startpos } }
 %inline op:
   | PLUS    { PlusBinOp }
   | MINUS   { MinusBinOp }
@@ -92,8 +103,8 @@ fundecldata:
 
 (* A type field *)
 tyfield:
-  | id=ID                 { Field { name=id; typean=None; pos=$startpos }  }
-  | id=ID COLON ty=typ    { Field { name=id; typean=Some(ty, $startpos(ty)); pos=$startpos }  }
+  | id=ID                 { Field { name=id; typean=None; pos=$startpos } }
+  | id=ID COLON ty=typ    { Field { name=id; typean=Some(ty, $startpos(ty)); pos=$startpos } }
 
 typ:
   | INT_TYPE                                                    { Int }

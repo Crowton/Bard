@@ -1,6 +1,6 @@
 open Bardcommon
 open Ast
-open Pretty_ast
+open Unparser
 
 module S = Map.Make(String)
 
@@ -19,9 +19,7 @@ let value_to_string (v: value) : string = match v with
   | StringVal s -> s
   | UnitVal -> "unit"
   | ClosureVal { params; restyp; body; _ } ->
-      concat ["("; params |> List.map (fun (Field { name; typean; _ }) -> name ^ ": " ^ string_of_typean typean) |> String.concat ",";
-              "): "; string_of_typean restyp;
-              string_of_exp body] 
+      concat ["("; unparse_paramslist params; ")"; unparse_typean restyp; " => "; unparse_exp body] 
 
 
 let typ_of_typean (t: typean) : typ = match t with
@@ -40,7 +38,7 @@ let type_of_val (v: value) : typ = match v with
       )
 
 let type_string_of_value (v: value) : string =
-  string_of_typ (type_of_val v)
+  unparse_typ (type_of_val v)
 
 
 exception InterpreterError of string * pos
@@ -97,8 +95,8 @@ let checkValueType (value: value) (typean: typean) (pos: pos) (fName: string) : 
         let realTy = type_of_val value in
         if realTy <> ty
         then raise (InterpreterError ("Type mismatch at " ^ fName ^ ". Expected "
-                                      ^ string_of_typ ty ^ ", but got "
-                                      ^ string_of_typ realTy ^ ".", pos))
+                                      ^ unparse_typ ty ^ ", but got "
+                                      ^ unparse_typ realTy ^ ".", pos))
 
 
 (* Binding ad rebinding functions *)

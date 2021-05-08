@@ -1,0 +1,129 @@
+let /* Util */
+	fun numberToString(i) =
+		if i == 0 then "0" else
+		if i == 1 then "1" else
+		if i == 2 then "2" else
+		if i == 3 then "3" else
+		if i == 4 then "4" else
+		if i == 5 then "5" else
+		if i == 6 then "6" else
+		if i == 7 then "7" else
+		if i == 8 then "8" else
+		if i == 9 then "9" else
+		"-"
+		/*numberToString(i / 10) ^ numberToString(i % 10)*/
+	
+	/* Math */
+	fun mod(x, n) = x - x / n * n
+
+	/* Pair stuff */
+	fun pair(x, y) =
+		let fun inner(f) = f(x, y)
+		in inner end
+	fun first(p) = let fun g(x, y) = x in p(g) end
+	fun second(p) = let fun g(x, y) = y in p(g) end
+	
+	/* List stuff */
+	val nil = -1
+	val cons = pair
+	val head = first
+	val tail = second
+	
+	fun get(index, list) = if index == 0 then head(list) else get(index - 1, tail(list))
+	fun set(index, value, list) = if index == 0 then cons(value, tail(list)) else cons(head(list), set(index - 1, value, tail(list)))
+	
+	fun sudokuToString(sudoku) =
+		let fun innerRec(index, partSudoku) =
+				if index == 81 then "-------------"
+				else (if mod(index, 9 * 3) == 0 then "-------------\n" else "")
+					  ^ (if mod(index, 3) == 0 then "|" else "")
+					  ^ numberToString(head(partSudoku))
+					  ^ (if mod(index, 9) == 8 then "|\n" else "")
+					  ^ innerRec(index + 1, tail(partSudoku))
+		in innerRec(0, sudoku) end
+	
+	/* Valid functions */
+	fun row(i) = i / 9
+	fun col(i) = mod(i, 9)
+	fun box(i) = row(i) / 3 * 3 + col(i) / 3
+	
+	fun validAt(index, value, sudoku) =
+		let val r = row(index)
+			val c = col(index)
+			val b = box(index)
+		
+			fun innerValid(partIndex, partSudoku) =
+				if partIndex == 81
+				then true
+				else
+					if index <> partIndex & head(partSudoku) == value & (r == row(partIndex) | c == col(partIndex) | b == box(partIndex))
+						then false
+						else innerValid(partIndex + 1, tail(partSudoku))
+		in
+			innerValid(0, sudoku)
+		end
+	
+	/* Main solver */
+	fun solve(sudoku) =
+		let fun innerSolve(index, sudoku) =
+			if index == 81
+			then pair(true, sudoku)
+			else if get(index, sudoku) <> 0 then innerSolve(index + 1, sudoku)
+			else
+				let fun for(i) =
+					if i == 10 then pair(false, sudoku)
+					else
+						if validAt(index, i, sudoku)
+						then
+							let val newSudoku = set(index, i, sudoku)
+								val recRes = innerSolve(index + 1, newSudoku)
+							in
+								if first(recRes) then recRes else for(i + 1)
+							end
+						else for(i + 1)
+				in
+					for(1)
+				end
+		in
+			innerSolve(0, sudoku)
+		end
+	
+	/* The input is:
+		5, 3, 0, 0, 7, 0, 0, 0, 0,
+		6, 0, 0, 1, 9, 5, 0, 0, 0,
+		0, 9, 8, 0, 0, 0, 0, 6, 0,
+		8, 0, 0, 0, 6, 0, 0, 0, 3,
+		4, 0, 0, 8, 0, 3, 0, 0, 1,
+		7, 0, 0, 0, 2, 0, 0, 0, 6,
+		0, 6, 0, 0, 0, 0, 2, 8, 0,
+		0, 0, 0, 4, 1, 9, 0, 0, 5,
+		0, 0, 0, 0, 8, 0, 0, 7, 9 */
+	val sudoku = nil
+	val sudoku = cons(9, sudoku) val sudoku = cons(7, sudoku) val sudoku = cons(0, sudoku) val sudoku = cons(0, sudoku) val sudoku = cons(8, sudoku) val sudoku = cons(0, sudoku) val sudoku = cons(0, sudoku) val sudoku = cons(0, sudoku) val sudoku = cons(0, sudoku)
+	val sudoku = cons(5, sudoku) val sudoku = cons(0, sudoku) val sudoku = cons(0, sudoku) val sudoku = cons(9, sudoku) val sudoku = cons(1, sudoku) val sudoku = cons(4, sudoku) val sudoku = cons(0, sudoku) val sudoku = cons(0, sudoku) val sudoku = cons(0, sudoku)
+	val sudoku = cons(0, sudoku) val sudoku = cons(8, sudoku) val sudoku = cons(2, sudoku) val sudoku = cons(0, sudoku) val sudoku = cons(0, sudoku) val sudoku = cons(0, sudoku) val sudoku = cons(0, sudoku) val sudoku = cons(6, sudoku) val sudoku = cons(0, sudoku)
+	val sudoku = cons(6, sudoku) val sudoku = cons(0, sudoku) val sudoku = cons(0, sudoku) val sudoku = cons(0, sudoku) val sudoku = cons(2, sudoku) val sudoku = cons(0, sudoku) val sudoku = cons(0, sudoku) val sudoku = cons(0, sudoku) val sudoku = cons(7, sudoku)
+	val sudoku = cons(1, sudoku) val sudoku = cons(0, sudoku) val sudoku = cons(0, sudoku) val sudoku = cons(3, sudoku) val sudoku = cons(0, sudoku) val sudoku = cons(8, sudoku) val sudoku = cons(0, sudoku) val sudoku = cons(0, sudoku) val sudoku = cons(4, sudoku)
+	val sudoku = cons(3, sudoku) val sudoku = cons(0, sudoku) val sudoku = cons(0, sudoku) val sudoku = cons(0, sudoku) val sudoku = cons(6, sudoku) val sudoku = cons(0, sudoku) val sudoku = cons(0, sudoku) val sudoku = cons(0, sudoku) val sudoku = cons(8, sudoku)
+	val sudoku = cons(0, sudoku) val sudoku = cons(6, sudoku) val sudoku = cons(0, sudoku) val sudoku = cons(0, sudoku) val sudoku = cons(0, sudoku) val sudoku = cons(0, sudoku) val sudoku = cons(8, sudoku) val sudoku = cons(9, sudoku) val sudoku = cons(0, sudoku)
+	val sudoku = cons(0, sudoku) val sudoku = cons(0, sudoku) val sudoku = cons(0, sudoku) val sudoku = cons(5, sudoku) val sudoku = cons(9, sudoku) val sudoku = cons(1, sudoku) val sudoku = cons(0, sudoku) val sudoku = cons(0, sudoku) val sudoku = cons(6, sudoku)
+	val sudoku = cons(0, sudoku) val sudoku = cons(0, sudoku) val sudoku = cons(0, sudoku) val sudoku = cons(0, sudoku) val sudoku = cons(7, sudoku) val sudoku = cons(0, sudoku) val sudoku = cons(0, sudoku) val sudoku = cons(3, sudoku) val sudoku = cons(5, sudoku)
+	
+	/* Empty sudoku 
+	val sudoku = nil
+	val sudoku = cons(0, sudoku) val sudoku = cons(0, sudoku) val sudoku = cons(0, sudoku) val sudoku = cons(0, sudoku) val sudoku = cons(0, sudoku) val sudoku = cons(0, sudoku) val sudoku = cons(0, sudoku) val sudoku = cons(0, sudoku) val sudoku = cons(0, sudoku)
+	val sudoku = cons(0, sudoku) val sudoku = cons(0, sudoku) val sudoku = cons(0, sudoku) val sudoku = cons(0, sudoku) val sudoku = cons(0, sudoku) val sudoku = cons(0, sudoku) val sudoku = cons(0, sudoku) val sudoku = cons(0, sudoku) val sudoku = cons(0, sudoku)
+	val sudoku = cons(0, sudoku) val sudoku = cons(0, sudoku) val sudoku = cons(0, sudoku) val sudoku = cons(0, sudoku) val sudoku = cons(0, sudoku) val sudoku = cons(0, sudoku) val sudoku = cons(0, sudoku) val sudoku = cons(0, sudoku) val sudoku = cons(0, sudoku)
+	val sudoku = cons(0, sudoku) val sudoku = cons(0, sudoku) val sudoku = cons(0, sudoku) val sudoku = cons(0, sudoku) val sudoku = cons(0, sudoku) val sudoku = cons(0, sudoku) val sudoku = cons(0, sudoku) val sudoku = cons(0, sudoku) val sudoku = cons(0, sudoku)
+	val sudoku = cons(0, sudoku) val sudoku = cons(0, sudoku) val sudoku = cons(0, sudoku) val sudoku = cons(0, sudoku) val sudoku = cons(0, sudoku) val sudoku = cons(0, sudoku) val sudoku = cons(0, sudoku) val sudoku = cons(0, sudoku) val sudoku = cons(0, sudoku)
+	val sudoku = cons(0, sudoku) val sudoku = cons(0, sudoku) val sudoku = cons(0, sudoku) val sudoku = cons(0, sudoku) val sudoku = cons(0, sudoku) val sudoku = cons(0, sudoku) val sudoku = cons(0, sudoku) val sudoku = cons(0, sudoku) val sudoku = cons(0, sudoku)
+	val sudoku = cons(0, sudoku) val sudoku = cons(0, sudoku) val sudoku = cons(0, sudoku) val sudoku = cons(0, sudoku) val sudoku = cons(0, sudoku) val sudoku = cons(0, sudoku) val sudoku = cons(0, sudoku) val sudoku = cons(0, sudoku) val sudoku = cons(0, sudoku)
+	val sudoku = cons(0, sudoku) val sudoku = cons(0, sudoku) val sudoku = cons(0, sudoku) val sudoku = cons(0, sudoku) val sudoku = cons(0, sudoku) val sudoku = cons(0, sudoku) val sudoku = cons(0, sudoku) val sudoku = cons(0, sudoku) val sudoku = cons(0, sudoku)
+	val sudoku = cons(0, sudoku) val sudoku = cons(0, sudoku) val sudoku = cons(0, sudoku) val sudoku = cons(0, sudoku) val sudoku = cons(0, sudoku) val sudoku = cons(0, sudoku) val sudoku = cons(0, sudoku) val sudoku = cons(0, sudoku) val sudoku = cons(0, sudoku)
+	*/
+	
+	val solution = solve(sudoku)
+in
+	"\nInput:\n" ^ sudokuToString(sudoku) ^
+	"\nResult:\n" ^ if first(solution) then sudokuToString(second(solution)) else "No solution"
+end

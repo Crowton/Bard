@@ -36,7 +36,7 @@ rule token = parse
 | '>'                 { GT }
 | ">="                { GE }
 | "=="                { EEQ }
-| "!="                { NEQ }
+| "<>"                { NEQ }
 | '&'                 { AND }
 | '|'                 { OR }
 | '~'                 { NOT }
@@ -78,5 +78,6 @@ and comment comment_level = parse
 and string_parse acc = parse
   '\"'                         { STRING acc }
 | notQuoteBackslash* as s      { string_parse (acc ^ s) lexbuf }
+| "\\n"                        { string_parse (acc ^ "\n") lexbuf }
 | _ as t                       { error lexbuf ("Invalid character in string '" ^ (String.make 1 t) ^ "'") }
 | eof                          { error lexbuf ("EOF found while lexing string") }

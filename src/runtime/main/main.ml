@@ -73,17 +73,9 @@ let evaluate { phase; out; _ } exp =
     res
 
 
-(* Our reference compiler should allow for stopping at different phases 
-   in the compilation and allow us to pick the right backend. We implement 
-   this using a straightforward command-line parsing/checking *)
-
-
 (* --- command-line checking; dispatching to the right phase --- *)  
 
 (*exception InvalidInput of string*)
-
-(* observe that we make sure that exit flags are raised upon
-   invalid return from each phase *)
 let withFlags ({phase;out;_} as config) =
   let exitCode = ref 0 in
   begin 

@@ -164,9 +164,9 @@ let rec eval (exp: exp) (env: env) : value = match exp with
       (match eval func env with
         | ClosureVal { params; restyp; body; env=cenv; defs } ->
             (if List.length params != List.length args
-              then raise (InterpreterError ("Wrong number of arguments supplied at function call." ^
+              then raise (InterpreterError ("Wrong number of arguments supplied at function call. " ^
                                             "Expected " ^ string_of_int (List.length params) ^
-                                            ", but got"^ string_of_int (List.length args) ^ ".", pos)));
+                                            ", but got "^ string_of_int (List.length args) ^ ".", pos)));
             let env' = List.combine args params |> List.fold_left (
                 fun env' ((exp, pos), Field { name; typean; _ }) ->
                   let res = eval exp env in

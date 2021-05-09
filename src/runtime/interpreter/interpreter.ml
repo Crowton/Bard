@@ -60,6 +60,13 @@ let eval_binop_int_to_bool leftVal rightVal pos f fName =
     | (IntVal l, IntVal r) -> BoolVal (f l r)
     | _ -> binop_err fName "Int" leftVal rightVal pos
 
+(* let eval_binop_compare leftVal rightVal pos (f: 'a -> 'a -> bool) fName =
+  match (leftVal, rightVal) with
+    | (IntVal l, IntVal r) -> BoolVal (f l r)
+    | (BoolVal l, BoolVal r) -> BoolVal (f l r)
+    | (StringVal l, StringVal r) -> BoolVal (f l r)
+    | _ -> binop_err fName "Int/String/Bool" leftVal rightVal pos *)
+
 let eval_binop_bool leftVal rightVal pos f fName =
   match (leftVal, rightVal) with
     | (BoolVal l, BoolVal r) -> BoolVal (f l r)

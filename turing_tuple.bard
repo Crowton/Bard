@@ -94,6 +94,19 @@ let /* Tuples */
 		nil))))))))))))))))))))))))))
 	
 	/* Initial tape = "_abbabaaba" */
+	/* val initial_tape =
+		cons(0,
+		cons(1,
+		cons(3,
+		cons(3,
+		cons(1,
+		cons(3,
+		cons(1,
+		cons(1,
+		cons(3,
+		cons(1,
+		nil)))))))))) */
+	
 	val initial_tape =
 		cons(0,
 		cons(1,
@@ -105,7 +118,24 @@ let /* Tuples */
 		cons(1,
 		cons(3,
 		cons(1,
-		nil))))))))))
+		cons(1,
+		cons(3,
+		cons(1,
+		cons(1,
+		cons(1,
+		cons(1,
+		cons(3,
+		cons(3,
+		cons(3,
+		cons(3,
+		cons(1,
+		cons(1,
+		cons(1,
+		cons(3,
+		cons(1,
+		cons(1,
+		cons(3,
+		nil)))))))))))))))))))))))))))
 	
 	/* Format tape */
 	fun symbol_to_string(symbol) =

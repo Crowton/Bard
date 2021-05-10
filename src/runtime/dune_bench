@@ -1,0 +1,12 @@
+(executable
+        (name benchmark)
+        (libraries bardbenchmarks)
+        )
+
+(install 
+    (section bin)
+    
+    (files (benchmark.bc as benchmark.bc) 
+           (benchmark.exe as benchmark)
+           ))
+

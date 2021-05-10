@@ -1,6 +1,7 @@
 (executable
         (name bard)        
-        (libraries bardmain))
+        (libraries bardmain)
+        )
 
 
 (install 

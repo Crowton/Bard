@@ -1,0 +1,4 @@
+(library
+        (name bardbenchmarks)
+        (libraries core bardcommon bardlexer bardparser bardinterpreter)
+        )

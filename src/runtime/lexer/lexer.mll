@@ -27,6 +27,9 @@ rule token = parse
 | ':'                 { COLON }
 | '('                 { LPAREN }
 | ')'                 { RPAREN }
+| '{'                 { LBRACE }
+| '}'                 { RBRACE }
+| "raisedTo"          { RAISEDTO }
 | '+'                 { PLUS }
 | '-'                 { MINUS }
 | '*'                 { TIMES }

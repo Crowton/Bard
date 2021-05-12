@@ -1,0 +1,5 @@
+RaisedToExp(
+  BinOpExp(TimesBinOp,
+  | IntLit(21),
+  | IntLit(2)),
+  {alice})

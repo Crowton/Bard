@@ -1,0 +1,3 @@
+RaisedToExp(
+  IntLit(42),
+  {alice,bob})

@@ -9,6 +9,7 @@
 %token <string> STRING
 %token COMMA COLON
 %token LPAREN RPAREN
+%token RAISEDTO LBRACE RBRACE
 %token PLUS MINUS TIMES DIVIDE
 %token LT LE GT GE EEQ NEQ
 %token AND OR NOT
@@ -21,6 +22,9 @@
    Precedence to the inner list - i.e. all functions in the same list *)
 %nonassoc fun_list_base
 %nonassoc FUN
+
+(* RaisedTo exp handles with lowest precedence *)
+%left RAISEDTO
 
 (* Handles if followed by binary exp and dangleling else *)
 %nonassoc THEN
@@ -60,6 +64,7 @@ exp:
   | FALSE                                        { BoolLit false }
   | s=STRING                                     { StringLit (s, $startpos) }
   | x=ID                                         { VarExp (x, $startpos) }
+  | e=exp RAISEDTO l=level                       { RaisedToExp { exp=e; level=l; pos=$startpos } }
   | MINUS e=exp                                  { UnOpExp { oper=NegUnOp; exp=e; pos=$startpos } }  %prec unary_minus
   | NOT e=exp                                    { UnOpExp { oper=NotUnOp; exp=e; pos=$startpos } }
   | e1=exp o=op e2=exp                           { BinOpExp { left=e1; oper=o; right=e2; pos=$startpos } }
@@ -70,6 +75,8 @@ exp:
   | LPAREN par=separated_list(COMMA, tyfield) RPAREN ARROW body=exp     { LambdaExp {params=par; body=body ; pos=$startpos } }  %prec lambda
   | LPAREN x=ID RPAREN ARROW body=exp            { LambdaExp {params=[Field { name=x; typean=None; pos=$startpos(x) }]; body=body ; pos=$startpos } }  %prec single_lambda
   | LET d=list(decl) IN e=exp END                { LetExp { decls=d; body=e; pos=$startpos } }
+%inline level:
+  | LBRACE l=separated_list(COMMA, ID) RBRACE    { list_to_set l }
 %inline op:
   | PLUS    { PlusBinOp }
   | MINUS   { MinusBinOp }

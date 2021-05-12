@@ -125,6 +125,8 @@ let rec eval (exp: exp) (env: env) : value = match exp with
         | Some v -> v
       )
   
+  | RaisedToExp { exp: exp; _ } -> eval exp env
+  
   | BinOpExp { left: exp; oper: binOp; right: exp; pos: pos } ->
       let leftVal = eval left env in
       let rightVal = eval right env in

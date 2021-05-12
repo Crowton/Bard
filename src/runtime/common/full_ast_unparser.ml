@@ -32,6 +32,10 @@ let field (Field { name; typean; _ }, d) =
     concat [ indent d; "("; name; ", "; string_of_typean typean; ")"]  
 
 
+let string_of_level (level: level): string =
+  concat [ "{"; Ast.S.fold (fun (l: string) (acc: string list) -> l :: acc) level [] |> List.rev |> String.concat ","; "}" ]
+
+
 let binopname = function
 | PlusBinOp  -> "PlusBinOp"
 | MinusBinOp -> "MinusBinOp"
@@ -58,7 +62,8 @@ let as_string e0 =
     | BoolLit b -> concat [indent d; "BoolLit("; string_of_bool b; ")"]
     | StringLit (s, _) -> concat [indent d; "StringLit(\""; String.escaped s ; "\")"]
     | VarExp (x, _) -> concat [ indent d; "VarExp("; x; ")" ]
-    | BinOpExp {left; oper; right; _ } -> 
+    | RaisedToExp { exp; level; _ } -> concat [ indent d; "RaisedToExp(\n"; string_of_exp (exp, d + 1); ",\n"; indent (d + 1); string_of_level level; ")" ]
+    | BinOpExp { left; oper; right; _ } -> 
         concat [ indent d; "BinOpExp("; binopname oper; ",\n"; string_of_exp (left, d + 1); ",\n"; string_of_exp (right, d + 1); ")"]
     | UnOpExp { oper; exp; _ } ->
         concat [ indent d; "UnOpExp("; unopname oper; ",\n"; string_of_exp (exp, d + 1); ")"]

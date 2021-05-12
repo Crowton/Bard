@@ -1,3 +1,5 @@
+module S = Set.Make(String)
+
 type pos = Lexing.position
 
 type binOp
@@ -19,11 +21,15 @@ type typ
 type typean
   = (typ * pos) option
 
+type level = S.t
+let list_to_set l = S.of_list l
+
 type exp
   = IntLit of int
   | BoolLit of bool
   | StringLit of string * pos
   | VarExp of id * pos
+  | RaisedToExp of { exp: exp; level: level; pos: pos }
   | BinOpExp of { left: exp; oper: binOp; right: exp; pos: pos }
   | UnOpExp of { oper: unOp; exp: exp; pos: pos }
   | IfExp of { test: exp; thn: exp; els: exp option; pos: pos }

@@ -29,6 +29,9 @@ let unparse_field (Field { name; typean; _ }) =
 let unparse_paramslist (params: fielddata list): string =
     params |> List.map unparse_field |> String.concat ", "
 
+let unparse_level level =
+    concat [ "{ "; Ast.S.fold (fun (l: string) (acc: string list) -> l :: acc) level [] |> List.rev |> String.concat ", "; " }" ]
+
 let unparse_binop = function
 | PlusBinOp -> "+"
 | MinusBinOp -> "-"
@@ -55,7 +58,8 @@ let unparsed e0 =
     | BoolLit b -> string_of_bool b
     | StringLit (s, _) -> "\"" ^ (String.escaped s) ^ "\""
     | VarExp (x, _) -> x
-    | BinOpExp {left; oper; right; _ } -> 
+    | RaisedToExp { exp; level; _ } -> concat [ unparse_exp (exp, d); " raisedTo "; unparse_level level ]
+    | BinOpExp { left; oper; right; _ } -> 
         concat ["("; unparse_exp (left, d); " "; unparse_binop oper; " "; unparse_exp (right, d); ")"]
     | UnOpExp { oper; exp; _ } ->
         concat ["("; unparse_unop oper; unparse_exp (exp, d); ")"]

@@ -1,4 +1,4 @@
-(** AST pretty printer implementation *)
+(** AST full information printer implementation *)
 
 open Ast
 

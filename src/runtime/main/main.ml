@@ -60,7 +60,7 @@ let parse { file; phase; out; _ } =
   in 
   close_in input;
   if phase = PAR
-  then Pretty_ast.print_exp out parseRes;
+  then Full_ast_unparser.print_exp out parseRes;
   parseRes
 
 let evaluate { phase; out; _ } exp =

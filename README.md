@@ -5,7 +5,7 @@
 1. Make sure `opam` is installed.
 2. Install all dependencies by running `make deps`
 3. Compile the template by running `make`
-4. Run the tests by running `make runtest`
+4. Run the tests by running `make test`
 
 ## Using custom utop
 

@@ -84,11 +84,11 @@ let withFlags ({phase;out;_} as config) =
       | LEX ->
           lexonly config
       | PAR ->
-          let _ = parse config in
+          let _: Ast.exp = parse config in
           ()
       | EVAL ->
           let exp = parse config in
-          let _ = evaluate config exp in
+          let _: Interpreter.value = evaluate config exp in
           ()
     with ExitMain p ->
            exitCode := (error_code p)

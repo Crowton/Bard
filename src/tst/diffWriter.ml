@@ -13,7 +13,7 @@ let logDiff test_name phase_name expected_name got_str =
     String.concat "" ["diff -u "; expected_name; " "; tmp_file] in
   let lines = Core.In_channel.input_lines inp in
   Core.In_channel.close inp;
-  let _ = Unix.close_process_in inp in
+  let _: Unix.process_status = Unix.close_process_in inp in
   Sys.remove tmp_file;
   diffs_rev := {test_name; phase_name; lines}::(!diffs_rev)
 

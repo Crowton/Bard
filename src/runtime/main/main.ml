@@ -72,6 +72,15 @@ let evaluate { phase; out; _ } exp =
     then Format.fprintf out "Result: %s\n" (Interpreter.value_to_string res);
     res
 
+let evaluate_label { phase; out; _ } exp =
+  let resTuple, err = Interpreter_with_labels.eval_top exp in
+  match err with
+  | Some (msg, p) -> Printf.eprintf "Exception at %d:%d: %s\n%!" p.pos_lnum (p.pos_cnum - p.pos_bol + 1) msg; raise (ExitMain EVAL_LABEL)
+  | None ->
+    if phase = EVAL_LABEL
+    then Format.fprintf out "Result: %s\n" (Interpreter_with_labels.full_value_to_string resTuple);
+    resTuple
+
 
 (* --- command-line checking; dispatching to the right phase --- *)  
 
@@ -89,6 +98,10 @@ let withFlags ({phase;out;_} as config) =
       | EVAL ->
           let exp = parse config in
           let _: Interpreter.value = evaluate config exp in
+          ()
+      | EVAL_LABEL ->
+          let exp = parse config in
+          let _: Interpreter_with_labels.value * Label.label * Label.label = evaluate_label config exp in
           ()
     with ExitMain p ->
            exitCode := (error_code p)
@@ -127,7 +140,7 @@ let withFlags ({phase;out;_} as config) =
         and out = flag ~aliases:["o"] "out" 
                     (optional string) ~doc:"FILE name of output FILE"
         and phase = flag ~aliases:["p"] "phase" 
-                    (optional_with_default "eval" string)
+                    (optional_with_default "eval_label" string)
           ~doc:"PHASE stop compilation after PHASE:\nlex, par, eval"
           |> map ~f:(fun p -> match fromHandleOpt p with 
                                 Some p -> p 

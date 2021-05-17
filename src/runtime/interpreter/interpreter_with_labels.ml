@@ -23,6 +23,9 @@ let value_to_string (v: value) : string = match v with
   | ClosureVal { params; restyp; body; _ } ->
       concat ["("; unparse_paramslist params; ")"; unparse_typean restyp; " => "; unparse_exp body] 
 
+let full_value_to_string (v: value * label * label) : string = match v with
+  | (value, label, bl) -> concat [value_to_string value; "@"; unparse_label label; "%"; unparse_label bl]
+
 
 let typ_of_typean (t: typean) : typ = match t with
   | None -> Any

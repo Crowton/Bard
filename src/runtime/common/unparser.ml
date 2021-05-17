@@ -1,6 +1,7 @@
 (** AST unparser printer implementation *)
 
 open Ast
+open Label
 
 
 let concat = String.concat ""
@@ -29,8 +30,8 @@ let unparse_field (Field { name; typean; _ }) =
 let unparse_paramslist (params: fielddata list): string =
     params |> List.map unparse_field |> String.concat ", "
 
-let unparse_level level =
-    concat [ "{ "; Ast.S.fold (fun (l: string) (acc: string list) -> l :: acc) level [] |> List.rev |> String.concat ", "; " }" ]
+let unparse_label label =
+    concat [ "{ "; label_to_list label |> String.concat ", "; " }" ]
 
 let unparse_binop = function
 | PlusBinOp -> "+"
@@ -58,7 +59,7 @@ let unparsed e0 =
     | BoolLit b -> string_of_bool b
     | StringLit (s, _) -> "\"" ^ (String.escaped s) ^ "\""
     | VarExp (x, _) -> x
-    | RaisedToExp { exp; level; _ } -> concat [ unparse_exp (exp, d); " raisedTo "; unparse_level level ]
+    | RaisedToExp { exp; label; _ } -> concat [ unparse_exp (exp, d); " raisedTo "; unparse_label label ]
     | BinOpExp { left; oper; right; _ } -> 
         concat ["("; unparse_exp (left, d); " "; unparse_binop oper; " "; unparse_exp (right, d); ")"]
     | UnOpExp { oper; exp; _ } ->

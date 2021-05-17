@@ -1,5 +1,6 @@
 %{
   open Bardcommon.Ast
+  open Bardcommon.Label
 %}
 
 %token EOF
@@ -64,7 +65,7 @@ exp:
   | FALSE                                        { BoolLit false }
   | s=STRING                                     { StringLit (s, $startpos) }
   | x=ID                                         { VarExp (x, $startpos) }
-  | e=exp RAISEDTO l=level                       { RaisedToExp { exp=e; level=l; pos=$startpos } }
+  | e=exp RAISEDTO l=level                       { RaisedToExp { exp=e; label=l; pos=$startpos } }
   | MINUS e=exp                                  { UnOpExp { oper=NegUnOp; exp=e; pos=$startpos } }  %prec unary_minus
   | NOT e=exp                                    { UnOpExp { oper=NotUnOp; exp=e; pos=$startpos } }
   | e1=exp o=op e2=exp                           { BinOpExp { left=e1; oper=o; right=e2; pos=$startpos } }
@@ -76,7 +77,7 @@ exp:
   | LPAREN x=ID RPAREN ARROW body=exp            { LambdaExp {params=[Field { name=x; typean=None; pos=$startpos(x) }]; body=body ; pos=$startpos } }  %prec single_lambda
   | LET d=list(decl) IN e=exp END                { LetExp { decls=d; body=e; pos=$startpos } }
 %inline level:
-  | LBRACE l=separated_list(COMMA, ID) RBRACE    { list_to_set l }
+  | LBRACE l=separated_list(COMMA, ID) RBRACE    { list_to_label l }
 %inline op:
   | PLUS    { PlusBinOp }
   | MINUS   { MinusBinOp }

@@ -1,0 +1,5 @@
+let val x = 3 raisedTo {secret}
+    val y: Int = x
+in
+    y
+end

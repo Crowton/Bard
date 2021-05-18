@@ -1,12 +1,13 @@
 (* See comments in runtests.ml *)
 
 type testphase 
-  = LEX | PAR | EVAL
+  = LEX | PAR | EVAL |  EVAL_LABEL
 
 let phaseName = function 
-    LEX -> "Lexer" 
+  | LEX -> "Lexer" 
   | PAR -> "Parser"
   | EVAL -> "Interpreter"
+  | EVAL_LABEL -> "Labeled Interpreter"
 
 let runWithStatus cmd =
   let inp = Unix.open_process_in cmd in
@@ -34,9 +35,11 @@ let findByExtension ?(sort=true) dir exts =
 (* we only call this for positive test cases *)
 let golden phase code out file overwrite =
   let golden_ext = match phase with 
-    LEX -> ".expected-lex"
-  | PAR -> ".expected-par" 
-  | EVAL -> ".expected-res" in
+    | LEX -> ".expected-lex"
+    | PAR -> ".expected-par" 
+    | EVAL -> ".expected-res"
+    | EVAL_LABEL -> ".expected-lab"
+  in
   let golden_file = file ^ golden_ext in
   match code, Sys.file_exists golden_file, overwrite with
   | 0, false, _ | 0, true, true ->
@@ -55,7 +58,7 @@ let golden phase code out file overwrite =
  
 let phaseFlag phase = "-p " ^ 
   match phase with 
-   LEX -> "lex" | PAR -> "par" | EVAL -> "eval"
+   LEX -> "lex" | PAR -> "par" | EVAL -> "eval" | EVAL_LABEL -> "eval_label"
    
 
 (* observe that if the exit code is non-zero we make no further checks *)  
@@ -89,7 +92,7 @@ let testCasesFromFiles options tester files =
       None -> files 
     | Some r -> List.filter ( 
         fun s -> 
-          try Str.search_forward r s 0|> fun _ -> true  
+          try Str.search_forward r s 0 |> fun _ -> true  
           with Not_found -> false            
         ) files in 
   List.map (fromFileName  tester) filtered 

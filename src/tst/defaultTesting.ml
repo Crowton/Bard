@@ -7,22 +7,26 @@ let neg_lex = findBards "testcases/neg/lex"
 let neg_par = findBards "testcases/neg/par" 
 let neg_eval = findBards "testcases/neg/eval"
 let pos_batch = findBards "testcases/pos/batch"
+let pos_labeled = findBards "testcases/pos/labeled"
 
 
 let posTests = function 
-  LEX -> neg_par @ neg_eval @ pos_batch 
+| LEX -> neg_par @ neg_eval @ pos_batch 
 | PAR -> neg_eval @ pos_batch
 | EVAL -> pos_batch
+| EVAL_LABEL -> pos_labeled
 
 let negTests = function 
-  LEX  -> neg_lex
+| LEX  -> neg_lex
 | PAR  -> neg_par
 | EVAL -> neg_eval
+| EVAL_LABEL -> []
 
 let error_code = function
 | LEX   -> 10
 | PAR   -> 20
 | EVAL  -> 30
+| EVAL_LABEL -> 40
 
 let defaultTestPos = goldenWithExitCode 0
 let defaultTestNeg phase = goldenWithExitCode @@ error_code @@ phase
@@ -31,7 +35,7 @@ let defaultPositives options phase =
     testCasesFromFiles options (defaultTestPos phase options.overwrite) (posTests phase)    
 
 let defaultNegatives options phase = 
-  testCasesFromFiles  options ((defaultTestNeg phase) phase options.overwrite)  (negTests phase)
+  testCasesFromFiles  options ((defaultTestNeg phase) phase options.overwrite) (negTests phase)
 
 (** create a list of deafult tests for a phase *)
 let defaultTests options phase = 

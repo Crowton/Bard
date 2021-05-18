@@ -1,0 +1,4 @@
+let fun f(): Int = 42 raisedTo {secret}
+in
+    f()
+end

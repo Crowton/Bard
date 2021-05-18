@@ -185,7 +185,7 @@ let rec eval (exp: exp) (env: env) (pc: label) (bl: label) : value * label * lab
                     | None -> bl''
                     | Some _ -> lub bl'' resLabel
                   in
-                  (S.add name (res, resLabel) env', resBl)
+                  (S.add name (res, lub resLabel l) env', resBl)
                 ) (cenv, lub bl' l) in
             let env'' = bindDefs defs env' l in
             let res, resLabel, bl''' = eval body env'' (lub pc l) bl'' in

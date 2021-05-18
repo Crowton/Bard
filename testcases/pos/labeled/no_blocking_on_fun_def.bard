@@ -1,0 +1,4 @@
+let fun f(x: Int): Int = x
+in
+    42
+end

@@ -9,4 +9,6 @@ let bot = S.empty
 (* let least_upper_bound label1 label2 = S.union label1 label2 *)
 let lub label1 label2 = S.union label1 label2
 
+let flows_to label1 label2 = S.subset label1 label2
+
 (* let (#|) label1 label2 = least_upper_bound label1 label2 *)

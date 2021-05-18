@@ -6,6 +6,7 @@ let findBards = (Core.Fn.flip findByExtension) [".bard"]
 let neg_lex = findBards "testcases/neg/lex" 
 let neg_par = findBards "testcases/neg/par" 
 let neg_eval = findBards "testcases/neg/eval"
+let neg_labeled = findBards "testcases/neg/labeled"
 let pos_batch = findBards "testcases/pos/batch"
 let pos_labeled = findBards "testcases/pos/labeled"
 
@@ -20,7 +21,7 @@ let negTests = function
 | LEX  -> neg_lex
 | PAR  -> neg_par
 | EVAL -> neg_eval
-| EVAL_LABEL -> []
+| EVAL_LABEL -> neg_labeled
 
 let error_code = function
 | LEX   -> 10

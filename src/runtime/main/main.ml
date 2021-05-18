@@ -73,7 +73,7 @@ let evaluate { phase; out; _ } exp =
     res
 
 let evaluate_label { phase; out; _ } exp =
-  let resTuple, err = Interpreter_with_labels.eval_top exp in
+  let resTuple, err = Interpreter_with_labels.eval_top exp out in
   match err with
   | Some (msg, p) -> Printf.eprintf "Exception at %d:%d: %s\n%!" p.pos_lnum (p.pos_cnum - p.pos_bol + 1) msg; raise (ExitMain EVAL_LABEL)
   | None ->

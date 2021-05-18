@@ -71,7 +71,7 @@ we should probably do that in a on-demand manner.
 
 let defaultPhasesToCheck = 
   let open BardGolden in 
-    [LEX; PAR; EVAL; EVAL_LABEL]
+    [(*LEX; PAR; EVAL;*) EVAL_LABEL]
 
 
 
@@ -135,4 +135,4 @@ let () =
   | _  -> ());
   let diff_file= "_build/_tests/diff-recent.html" in
   DiffWriter.writeResults diff_file;
-  Printf.printf "The diff of the most recent test run is available in %s\n" diff_file
+  Printf.printf " The diff of the most recent test run is available in %s\n" diff_file

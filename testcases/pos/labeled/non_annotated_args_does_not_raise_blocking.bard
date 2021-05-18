@@ -1,0 +1,5 @@
+let fun f(x, y) = x
+    val q = 4 raisedTo {secret}
+in
+    f(q, let val _ = send 3 in 1 end)
+end

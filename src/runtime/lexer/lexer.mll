@@ -30,6 +30,7 @@ rule token = parse
 | '{'                 { LBRACE }
 | '}'                 { RBRACE }
 | "raisedTo"          { RAISEDTO }
+| "send"              { SEND }
 | '+'                 { PLUS }
 | '-'                 { MINUS }
 | '*'                 { TIMES }

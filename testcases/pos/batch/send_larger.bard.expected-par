@@ -1,0 +1,3 @@
+SendExp(BinOpExp(TimesBinOp,
+  IntLit(2),
+  IntLit(7)))

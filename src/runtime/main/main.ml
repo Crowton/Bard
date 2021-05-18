@@ -64,7 +64,7 @@ let parse { file; phase; out; _ } =
   parseRes
 
 let evaluate { phase; out; _ } exp =
-  let res, err = Interpreter.eval_top exp in
+  let res, err = Interpreter.eval_top exp out in
   match err with
   | Some (msg, p) -> Printf.eprintf "Exception at %d:%d: %s\n%!" p.pos_lnum (p.pos_cnum - p.pos_bol + 1) msg; raise (ExitMain EVAL)
   | None ->

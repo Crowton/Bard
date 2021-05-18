@@ -63,7 +63,8 @@ let as_string e0 =
     | StringLit (s, _) -> concat [indent d; "StringLit(\""; String.escaped s ; "\")"]
     | VarExp (x, _) -> concat [ indent d; "VarExp("; x; ")" ]
     | RaisedToExp { exp; label; _ } -> concat [ indent d; "RaisedToExp(\n"; string_of_exp (exp, d + 1); ",\n"; indent (d + 1); string_of_label label; ")" ]
-    | BinOpExp { left; oper; right; _ } -> 
+    | SendExp { exp; _ } -> concat [indent d; "SendExp("; string_of_exp (exp, d); ")"]
+    | BinOpExp { left; oper; right; _ } ->
         concat [ indent d; "BinOpExp("; binopname oper; ",\n"; string_of_exp (left, d + 1); ",\n"; string_of_exp (right, d + 1); ")"]
     | UnOpExp { oper; exp; _ } ->
         concat [ indent d; "UnOpExp("; unopname oper; ",\n"; string_of_exp (exp, d + 1); ")"]

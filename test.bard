@@ -1,5 +1,1 @@
-let val x = true raisedTo { secret }
-    val y = if x then 42 else 80
-in
-    42
-end
+send 3 + 4

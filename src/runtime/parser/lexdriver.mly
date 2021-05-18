@@ -8,9 +8,10 @@ anytoken:
   | FALSE { "FALSE" , $startpos }
   | s = STRING { "STRING \"" ^ String.escaped s ^"\"", $startpos }
   | x = ID { "ID " ^ x, $startpos }
-  | RAISEDTO { "RAISEDTO" , $startpos }
   | LBRACE { "LBRACE" , $startpos }
   | RBRACE { "RBRACE" , $startpos }
+  | RAISEDTO { "RAISEDTO" , $startpos }
+  | SEND { "SEND" , $startpos }
   | COMMA { "COMMA" , $startpos }
   | COLON { "COLON" , $startpos }
   | LPAREN { "LPAREN" , $startpos }

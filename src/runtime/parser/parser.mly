@@ -10,7 +10,7 @@
 %token <string> STRING
 %token COMMA COLON
 %token LPAREN RPAREN
-%token RAISEDTO LBRACE RBRACE
+%token RAISEDTO LBRACE RBRACE SEND
 %token PLUS MINUS TIMES DIVIDE
 %token LT LE GT GE EEQ NEQ
 %token AND OR NOT
@@ -24,7 +24,8 @@
 %nonassoc fun_list_base
 %nonassoc FUN
 
-(* RaisedTo exp handles with lowest precedence *)
+(* RaisedTo and send exp handles with lowest precedence *)
+%nonassoc SEND
 %left RAISEDTO
 
 (* Handles if followed by binary exp and dangleling else *)
@@ -66,6 +67,7 @@ exp:
   | s=STRING                                     { StringLit (s, $startpos) }
   | x=ID                                         { VarExp (x, $startpos) }
   | e=exp RAISEDTO l=level                       { RaisedToExp { exp=e; label=l; pos=$startpos } }
+  | SEND e=exp                                   { SendExp { exp=e; pos=$startpos } }
   | MINUS e=exp                                  { UnOpExp { oper=NegUnOp; exp=e; pos=$startpos } }  %prec unary_minus
   | NOT e=exp                                    { UnOpExp { oper=NotUnOp; exp=e; pos=$startpos } }
   | e1=exp o=op e2=exp                           { BinOpExp { left=e1; oper=o; right=e2; pos=$startpos } }

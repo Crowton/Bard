@@ -17,9 +17,9 @@ let as_string typ texp =
     | RaisedToExp { texp; label; _ } -> concat [ indent d; "RaisedToExp(\n"; string_of_texp (texp, d + 1); ",\n"; indent (d + 1); string_of_label label; ")" ]
     | SendExp { texp; _ } -> concat [indent d; "SendExp("; string_of_texp (texp, d); ")"]
     | BinOpExp { left; oper; right; canfail; _ } ->
-        concat [ indent d; "BinOpExp("; binopname oper; ",\n"; string_of_texp (left, d + 1); ",\n"; string_of_texp (right, d + 1); ",\n"; string_of_bool canfail; ")"]
+        concat [ indent d; "BinOpExp("; binopname oper; ",\n"; string_of_texp (left, d + 1); ",\n"; string_of_texp (right, d + 1); ",\n"; indent (d + 1); string_of_bool canfail; ")"]
     | UnOpExp { oper; texp; canfail; _ } ->
-        concat [ indent d; "UnOpExp("; unopname oper; ",\n"; string_of_texp (texp, d + 1); ",\n"; string_of_bool canfail; ")"]
+        concat [ indent d; "UnOpExp("; unopname oper; ",\n"; string_of_texp (texp, d + 1); ",\n"; indent (d + 1); string_of_bool canfail; ")"]
     | IfExp { test; thn; els; _ }    -> 
        concat [ indent d; "IfExp(\n"; string_of_texp (test, d + 1); ",\n"; string_of_texp (thn, d + 1);
                 (match els with None -> "" | Some e -> ",\n" ^ string_of_texp (e, d + 1)) ; ")"]
@@ -29,8 +29,8 @@ let as_string typ texp =
                ; string_of_texp (func, d + 1)
                ; ", ["
                ; dolist d (fun ((a, b, _), d') -> concat ["("; string_of_texp (a, d'); ", "; string_of_bool b; ")"]) args
-               ; "], "
-               ; string_of_bool rescanfail
+               ; "],\n"
+               ; indent (d + 1); string_of_bool rescanfail
                ; ")"
                ]
     | LambdaExp { params: fielddata list ; body: texp ; _ } ->
@@ -54,7 +54,7 @@ let as_string typ texp =
               ; ",\n"
               ; string_of_texp (init, d + 1)
               ; ",\n"
-              ; string_of_bool canfail
+              ; indent (d + 1); string_of_bool canfail
               ; ")"]
   
   in string_of_typ typ ^ "\n" ^ string_of_texp (texp, 0)

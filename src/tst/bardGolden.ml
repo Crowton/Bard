@@ -1,13 +1,14 @@
 (* See comments in runtests.ml *)
 
 type testphase 
-  = LEX | PAR | EVAL |  EVAL_LABEL
+  = LEX | PAR | EVAL |  EVAL_LABEL | TYPE
 
 let phaseName = function 
   | LEX -> "Lexer" 
   | PAR -> "Parser"
   | EVAL -> "Interpreter"
   | EVAL_LABEL -> "Labeled Interpreter"
+  | TYPE -> "Typechecker"
 
 let runWithStatus cmd =
   let inp = Unix.open_process_in cmd in
@@ -39,6 +40,7 @@ let golden phase code out file overwrite =
     | PAR -> ".expected-par" 
     | EVAL -> ".expected-res"
     | EVAL_LABEL -> ".expected-lab"
+    | TYPE -> ".expected-typ"
   in
   let golden_file = file ^ golden_ext in
   match code, Sys.file_exists golden_file, overwrite with
@@ -58,7 +60,7 @@ let golden phase code out file overwrite =
  
 let phaseFlag phase = "-p " ^ 
   match phase with 
-   LEX -> "lex" | PAR -> "par" | EVAL -> "eval" | EVAL_LABEL -> "eval_label"
+   LEX -> "lex" | PAR -> "par" | EVAL -> "eval" | EVAL_LABEL -> "eval_label" | TYPE -> "type"
    
 
 (* observe that if the exit code is non-zero we make no further checks *)  

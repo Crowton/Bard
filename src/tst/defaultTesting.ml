@@ -7,8 +7,10 @@ let neg_lex = findBards "testcases/neg/lex"
 let neg_par = findBards "testcases/neg/par" 
 let neg_eval = findBards "testcases/neg/eval"
 let neg_labeled = findBards "testcases/neg/labeled"
+let neg_type = findBards "testcases/neg/type"
 let pos_batch = findBards "testcases/pos/batch"
 let pos_labeled = findBards "testcases/pos/labeled"
+let pos_type = findBards "testcases/pos/type"
 
 
 let posTests = function 
@@ -16,18 +18,21 @@ let posTests = function
 | PAR -> neg_eval @ pos_batch
 | EVAL -> pos_batch
 | EVAL_LABEL -> pos_labeled
+| TYPE -> pos_type
 
 let negTests = function 
 | LEX  -> neg_lex
 | PAR  -> neg_par
 | EVAL -> neg_eval
 | EVAL_LABEL -> neg_labeled
+| TYPE -> neg_type
 
 let error_code = function
 | LEX   -> 10
 | PAR   -> 20
 | EVAL  -> 30
 | EVAL_LABEL -> 40
+| TYPE  -> 50
 
 let defaultTestPos = goldenWithExitCode 0
 let defaultTestNeg phase = goldenWithExitCode @@ error_code @@ phase

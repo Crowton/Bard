@@ -21,6 +21,13 @@ let check_binop (pos: pos) (leftType: typ) (rightType: typ) (demandType: typ): b
                             ^ Unparser.unparse_typ leftType ^ ", "
                             ^ Unparser.unparse_typ rightType ^ ").", pos))
 
+let check_unop (pos: pos) (typ: typ) (demandType: typ): bool =
+  match typ with
+  | Any -> true
+  | t when t = demandType -> false
+  | _ -> raise (TypeError ("Type mismatch at unary operator. Expected " ^ Unparser.unparse_typ demandType ^ ", but got "
+                            ^ Unparser.unparse_typ typ ^ ".", pos))
+
 
 let rec typecheck (exp: A.exp) (tenv: tenv): (typ * T.texp) = match exp with
   | A.IntLit i -> (Int, T.IntLit i)
@@ -55,11 +62,32 @@ let rec typecheck (exp: A.exp) (tenv: tenv): (typ * T.texp) = match exp with
       in
       (resType, T.BinOpExp { left=leftTexp; oper=oper; right=rightTexp; canfail=canFail; pos=pos })
 
-  (*| A.UnOpExp { oper: unOp; exp: exp; pos: pos }
+  | A.UnOpExp { oper: unOp; exp: A.exp; pos: pos } ->
+      let typ, texp = typecheck exp tenv in
+      let check = check_unop pos typ in
+      let canFail, resType = match oper with
+                             | NegUnOp -> (check Int, Int)
+                             | NotUnOp -> (check Bool, Bool)
+      in
+      (resType, T.UnOpExp { oper=oper; texp=texp; canfail=canFail; pos=pos })
 
-  | A.IfExp { test: exp; thn: exp; els: exp option; pos: pos }
 
-  | A.CallExp { func: exp; args: (exp * pos) list; pos: pos }
+  | A.IfExp { test: A.exp; thn: A.exp; els: A.exp option; pos: pos } ->
+      let testT, testTexp = typecheck test tenv in
+      (match testT with
+       | Bool | Any -> () (* Do nothing. "can fail" but label must be raised anyways *)
+       | _ -> raise (TypeError ("Condition at if expected Boolean but got " ^ Unparser.unparse_typ testT, pos))
+      );
+      let thnT, thnTexp = typecheck thn tenv in
+      let elsT, elsTexp =
+          match els with
+          | None -> (Unit, None)
+          | Some e -> let eT, eTexp = typecheck e tenv in (eT, Some eTexp)
+      in
+      let resT = if thnT = elsT then thnT else Any in
+      (resT, T.IfExp { test=testTexp; thn=thnTexp; els=elsTexp; pos=pos })
+
+  (*| A.CallExp { func: exp; args: (exp * pos) list; pos: pos }
 
   | A.LambdaExp { params: fielddata list ; body: exp ; pos: pos }
 

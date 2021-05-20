@@ -19,7 +19,7 @@ let rec string_of_typ t = match t with
   | Unit -> "Unit"
   | FunType (typlist, rettyp) ->
       concat ["("; typlist |> List.map string_of_typ |> String.concat ","; ") => "; string_of_typ rettyp]
-  | Any -> "_"
+  | Any -> "Any"
 
 let string_of_typean t = match t with
   | None -> "NO_TY"

@@ -1,0 +1,4 @@
+Int
+UnOpExp(NegUnOp,
+  IntLit(3),
+  false)

@@ -1,0 +1,4 @@
+(library
+        (name bardtypechecker)
+        (libraries bardcommon)
+        )

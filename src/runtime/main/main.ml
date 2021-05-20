@@ -4,6 +4,7 @@ open Bardcommon
 open Bardlexer
 open Bardparser
 open Bardinterpreter
+open Bardtypechecker
 
 open Phases
 open ExitCodes
@@ -82,6 +83,16 @@ let evaluate_label { phase; out; _ } exp =
     resTuple
 
 
+let typecheck { phase; out; _ } exp =
+  let resType, resExp, err = Typechecker.typecheck_top exp in
+  match err with
+  | Some (msg, p) -> Printf.eprintf "Exception at %d:%d: %s\n%!" p.pos_lnum (p.pos_cnum - p.pos_bol + 1) msg; raise (ExitMain TYPE)
+  | None ->
+    if phase = TYPE
+    then Full_typed_ast_unparser.print_exp out resType resExp;
+    (resType, resExp)
+
+
 (* --- command-line checking; dispatching to the right phase --- *)  
 
 (*exception InvalidInput of string*)
@@ -102,6 +113,10 @@ let withFlags ({phase;out;_} as config) =
       | EVAL_LABEL ->
           let exp = parse config in
           let _: Interpreter_with_labels.value * Label.label * Label.label = evaluate_label config exp in
+          ()
+      | TYPE ->
+          let exp = parse config in
+          let _: Ast_common.typ * Typed_ast.texp = typecheck config exp in
           ()
     with ExitMain p ->
            exitCode := (error_code p)

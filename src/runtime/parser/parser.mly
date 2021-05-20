@@ -1,5 +1,6 @@
 %{
   open Bardcommon.Ast
+  open Bardcommon.Ast_common
   open Bardcommon.Label
 %}
 

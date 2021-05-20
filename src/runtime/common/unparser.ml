@@ -2,6 +2,7 @@
 
 open Ast
 open Label
+open Ast_common
 
 
 let concat = String.concat ""

@@ -7,3 +7,4 @@ let error_code = function
 | PAR        -> 20
 | EVAL       -> 30
 | EVAL_LABEL -> 40
+| TYPE       -> 50

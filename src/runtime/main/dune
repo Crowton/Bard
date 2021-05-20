@@ -1,5 +1,5 @@
 (library
         (name bardmain)
-        (libraries core bardcommon bardlexer bardparser bardinterpreter)
+        (libraries core bardcommon bardlexer bardparser bardinterpreter bardtypechecker)
         (preprocess (pps ppx_jane))
         )

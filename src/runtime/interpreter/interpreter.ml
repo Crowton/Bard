@@ -1,5 +1,6 @@
 open Bardcommon
 open Ast
+open Ast_common
 open Unparser
 
 module S = Map.Make(String)

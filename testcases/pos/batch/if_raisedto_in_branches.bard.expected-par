@@ -1,0 +1,8 @@
+IfExp(
+  BoolLit(true),
+  RaisedToExp(
+  | IntLit(21),
+  | {secret}),
+  RaisedToExp(
+  | IntLit(42),
+  | {secret}))

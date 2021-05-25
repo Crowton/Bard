@@ -25,13 +25,14 @@
 %nonassoc fun_list_base
 %nonassoc FUN
 
-(* RaisedTo and send exp handles with lowest precedence *)
-%nonassoc SEND
-%left RAISEDTO
-
 (* Handles if followed by binary exp and dangleling else *)
 %nonassoc THEN
 %nonassoc ELSE
+
+(* RaisedTo and send exp handles with lowest precedence
+   apart from in branches of if *)
+%nonassoc SEND
+%left RAISEDTO
 
 (* Handle lambda creation *)
 %nonassoc single_lambda

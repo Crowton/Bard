@@ -1,0 +1,4 @@
+let val x: Int = if true then 10 else "hello"
+in
+    x + 7
+end

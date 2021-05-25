@@ -1,0 +1,4 @@
+let val x: Int = (if false then "world" else 21) raisedTo {secret}
+in
+    send "hello"
+end

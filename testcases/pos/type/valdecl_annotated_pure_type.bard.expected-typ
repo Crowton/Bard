@@ -1,0 +1,10 @@
+Int
+LetExp([
+  VarDec(x, Int,
+  | IntLit(10),
+  | false)],
+  BinOpExp(PlusBinOp,
+  | VarExp(x),
+  | IntLit(7),
+  | false,
+  | false))

@@ -91,9 +91,27 @@ let rec typecheck (exp: A.exp) (tenv: tenv): (typ * T.texp) = match exp with
 
   (*| A.CallExp { func: exp; args: (exp * pos) list; pos: pos }
 
-  | A.LambdaExp { params: fielddata list ; body: exp ; pos: pos }
+  | A.LambdaExp { params: fielddata list ; body: exp ; pos: pos } *)
 
-  | A.LetExp { decls: decl list; body: exp; pos: pos } *)
+  | A.LetExp { decls: A.decl list; body: A.exp; pos: pos } ->
+      let tenv', decls'rev = decls |> List.fold_left (fun (tenv, declsrev) decl -> let tenv', decl' = typecheck_decl decl tenv in (tenv', decl' :: declsrev)) (tenv, []) in
+      let bodyT, bodyTexp = typecheck body tenv' in
+      (bodyT, T.LetExp { decls=List.rev decls'rev; body=bodyTexp; pos=pos })
+
+and typecheck_decl (decl: A.decl) (tenv: tenv): (tenv * T.decl) = match decl with
+  (* | A.FunDec fundecldatalist -> (tenv, T.FunDec []) *)
+  | A.ValDec { name: id; typean: typean; init: A.exp; pos: pos } ->
+      let initT, initTexp = typecheck init tenv in
+      let resTy, canfail = match typean with
+        | None -> (initT, false)
+        | Some (t, _) ->
+            (match initT with
+             | Any -> (t, true)
+             | t' when t' = t -> (t, false)
+             | _ -> raise (TypeError ("Typeannotation at val declaration expected " ^ Unparser_common.unparse_typ t ^ " but got " ^ Unparser_common.unparse_typ initT, pos)))
+      in
+      (S.add name resTy tenv, T.ValDec { name=name; typean=typean; init=initTexp; canfail=canfail; pos=pos })
+
 
 
 let typecheck_top (exp: A.exp): (typ * T.texp * ((string * pos) option)) =

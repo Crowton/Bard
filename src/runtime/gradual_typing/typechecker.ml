@@ -16,17 +16,17 @@ let check_binop (pos: pos) (leftType: typ) (rightType: typ) (demandType: typ): b
   match (leftType, rightType) with
   | (Any, _) | (_, Any) -> true
   | (t1, t2) when t1 = demandType && t2 = demandType -> false
-  | _ -> let demandTypeString = Unparser.unparse_typ demandType in
+  | _ -> let demandTypeString = Unparser_common.unparse_typ demandType in
          raise (TypeError ("Type mismatch at binary operator. Expected (" ^ demandTypeString ^ ", " ^ demandTypeString ^ "), but got ("
-                            ^ Unparser.unparse_typ leftType ^ ", "
-                            ^ Unparser.unparse_typ rightType ^ ").", pos))
+                            ^ Unparser_common.unparse_typ leftType ^ ", "
+                            ^ Unparser_common.unparse_typ rightType ^ ").", pos))
 
 let check_unop (pos: pos) (typ: typ) (demandType: typ): bool =
   match typ with
   | Any -> true
   | t when t = demandType -> false
-  | _ -> raise (TypeError ("Type mismatch at unary operator. Expected " ^ Unparser.unparse_typ demandType ^ ", but got "
-                            ^ Unparser.unparse_typ typ ^ ".", pos))
+  | _ -> raise (TypeError ("Type mismatch at unary operator. Expected " ^ Unparser_common.unparse_typ demandType ^ ", but got "
+                            ^ Unparser_common.unparse_typ typ ^ ".", pos))
 
 
 let rec typecheck (exp: A.exp) (tenv: tenv): (typ * T.texp) = match exp with
@@ -76,7 +76,7 @@ let rec typecheck (exp: A.exp) (tenv: tenv): (typ * T.texp) = match exp with
       let testT, testTexp = typecheck test tenv in
       (match testT with
        | Bool | Any -> () (* Do nothing. "can fail" but label must be raised anyways *)
-       | _ -> raise (TypeError ("Condition at if expected Boolean but got " ^ Unparser.unparse_typ testT, pos))
+       | _ -> raise (TypeError ("Condition at if expected Boolean but got " ^ Unparser_common.unparse_typ testT, pos))
       );
       let thnT, thnTexp = typecheck thn tenv in
       let elsT, elsTexp =

@@ -2,6 +2,7 @@ open Bardcommon
 open Ast
 open Ast_common
 open Unparser
+open Unparser_common
 open Label
 
 module S = Map.Make(String)

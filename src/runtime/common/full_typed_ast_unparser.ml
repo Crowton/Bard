@@ -16,8 +16,9 @@ let as_string typ texp =
     | VarExp (x, _) -> concat [ indent d; "VarExp("; x; ")" ]
     | RaisedToExp { texp; label; _ } -> concat [ indent d; "RaisedToExp(\n"; string_of_texp (texp, d + 1); ",\n"; indent (d + 1); string_of_label label; ")" ]
     | SendExp { texp; _ } -> concat [indent d; "SendExp("; string_of_texp (texp, d); ")"]
-    | BinOpExp { left; oper; right; canfail; _ } ->
-        concat [ indent d; "BinOpExp("; binopname oper; ",\n"; string_of_texp (left, d + 1); ",\n"; string_of_texp (right, d + 1); ",\n"; indent (d + 1); string_of_bool canfail; ")"]
+    | BinOpExp { left; oper; right; leftcanfail; rightcanfail; _ } ->
+        concat [ indent d; "BinOpExp("; binopname oper; ",\n"; string_of_texp (left, d + 1); ",\n"; string_of_texp (right, d + 1);
+        ",\n"; indent (d + 1); string_of_bool leftcanfail; ",\n"; indent (d + 1); string_of_bool rightcanfail; ")"]
     | UnOpExp { oper; texp; canfail; _ } ->
         concat [ indent d; "UnOpExp("; unopname oper; ",\n"; string_of_texp (texp, d + 1); ",\n"; indent (d + 1); string_of_bool canfail; ")"]
     | IfExp { test; thn; els; _ }    -> 

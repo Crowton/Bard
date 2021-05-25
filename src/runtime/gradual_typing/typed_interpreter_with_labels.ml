@@ -120,7 +120,7 @@ let bindDefs (defs: fundecldata list) (env: env) (label: label) : env =
    Catch errors and propegate to Main program *)
 let eval_top texp out =
 
-  (* Recursive evalueation function *)
+  (* Recursive evaluation function *)
   let rec eval (texp: texp) (env: env) (pc: label) (bl: label) : value * label * label = match texp with
     | IntLit i -> (IntVal i, pc, bl)
     | BoolLit b -> (BoolVal b, pc, bl)
@@ -141,7 +141,7 @@ let eval_top texp out =
               (UnitVal, pc, lub bl' (lub l pc)))
           else raise (InterpreterError ("Cannot send at current label.", pos))
     
-    | BinOpExp { left: texp; oper: binOp; right: texp; canfail: bool; pos: pos } ->
+    | BinOpExp { left: texp; oper: binOp; right: texp; leftcanfail: bool; rightcanfail: bool; pos: pos } ->
         let leftVal, leftLabel, bl' = eval left env pc bl in
         let rightVal, rightLabel, bl'' = eval right env pc bl' in
         let int_eval = eval_binop_int leftVal rightVal pos in
@@ -164,8 +164,9 @@ let eval_top texp out =
           | ConcatBinOp -> string_eval (^) "Concatenation"
         in
         let resLabel = lub leftLabel rightLabel in
-        let resBl = if canfail then lub bl'' resLabel else bl'' in
-        (resVal, resLabel, resBl)
+        let resBl = if leftcanfail then lub bl'' leftLabel else bl'' in
+        let resBl' = if rightcanfail then lub resBl rightLabel else resBl in
+        (resVal, resLabel, resBl')
     | UnOpExp { oper: unOp; texp: texp; canfail: bool; pos: pos } ->
         let expVal, expLabel, bl' = eval texp env pc bl in
         let resVal = match oper with
@@ -196,7 +197,7 @@ let eval_top texp out =
               let env', bl'' = List.combine args params |> List.fold_left (
                   fun (env', bl') ((arg, canfail, pos), Field { name; typean; _ }) ->
                     let res, resLabel, bl'' = eval arg env pc bl' in
-                    checkValueType res typean pos "function argument";
+                    if canfail then checkValueType res typean pos "function argument";
                     let resBl = match typean with
                       | None -> bl''
                       | Some _ -> if canfail then lub bl'' resLabel else bl''
@@ -205,7 +206,7 @@ let eval_top texp out =
                   ) (cenv, lub bl' l) in
               let env'' = bindDefs defs env' l in
               let res, resLabel, bl''' = eval body env'' (lub pc l) bl'' in
-              checkValueType res restyp pos "function return value";
+              if rescanfail then checkValueType res restyp pos "function return value";
               let resBl = match restyp with
                 | None -> bl'''
                 | Some _ -> if rescanfail then lub bl''' resLabel else bl'''
@@ -227,7 +228,7 @@ let eval_top texp out =
         (bindDefs defs env pc, bl)
     | ValDec { name: id; typean: typean; init: texp; canfail: bool; pos: pos } ->
         let res, resLabel, bl' = eval init env pc bl in
-        checkValueType res typean pos "ValDecl";
+        if canfail then checkValueType res typean pos "ValDecl";
         let resBl = match typean with
           | None -> bl'
           | Some _ -> if canfail then lub bl' resLabel else bl'

@@ -12,10 +12,12 @@ type tenv = typ S.t
 exception TypeError of string * pos
 
 
-let check_binop (pos: pos) (leftType: typ) (rightType: typ) (demandType: typ): bool =
+let check_binop (pos: pos) (leftType: typ) (rightType: typ) (demandType: typ): (bool * bool) =
   match (leftType, rightType) with
-  | (Any, _) | (_, Any) -> true
-  | (t1, t2) when t1 = demandType && t2 = demandType -> false
+  | (Any, Any) -> (true, true)
+  | (Any, t2) when t2 = demandType -> (true, false)
+  | (t1, Any) when t1 = demandType -> (false, true)
+  | (t1, t2) when t1 = demandType && t2 = demandType -> (false, false)
   | _ -> let demandTypeString = Unparser_common.unparse_typ demandType in
          raise (TypeError ("Type mismatch at binary operator. Expected (" ^ demandTypeString ^ ", " ^ demandTypeString ^ "), but got ("
                             ^ Unparser_common.unparse_typ leftType ^ ", "
@@ -60,7 +62,7 @@ let rec typecheck (exp: A.exp) (tenv: tenv): (typ * T.texp) = match exp with
                              | ConcatBinOp
                                 -> (check String, String)
       in
-      (resType, T.BinOpExp { left=leftTexp; oper=oper; right=rightTexp; canfail=canFail; pos=pos })
+      (resType, T.BinOpExp { left=leftTexp; oper=oper; right=rightTexp; leftcanfail=fst canFail; rightcanfail=snd canFail; pos=pos })
 
   | A.UnOpExp { oper: unOp; exp: A.exp; pos: pos } ->
       let typ, texp = typecheck exp tenv in

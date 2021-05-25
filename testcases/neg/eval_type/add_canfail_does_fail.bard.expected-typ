@@ -1,0 +1,11 @@
+Int
+BinOpExp(PlusBinOp,
+  RaisedToExp(
+  | IntLit(21),
+  | {secret}),
+  IfExp(
+  | BoolLit(false),
+  | IntLit(21),
+  | StringLit("world")),
+  false,
+  true)

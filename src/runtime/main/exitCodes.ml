@@ -8,3 +8,4 @@ let error_code = function
 | EVAL       -> 30
 | EVAL_LABEL -> 40
 | TYPE       -> 50
+| EVAL_TYPE  -> 60

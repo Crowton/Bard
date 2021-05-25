@@ -93,6 +93,16 @@ let typecheck { phase; out; _ } exp =
     (resType, resExp)
 
 
+let evaluate_typed { phase; out; _ } texp =
+  let resTuple, err = Typed_interpreter_with_labels.eval_top texp out in
+  match err with
+  | Some (msg, p) -> Printf.eprintf "Exception at %d:%d: %s\n%!" p.pos_lnum (p.pos_cnum - p.pos_bol + 1) msg; raise (ExitMain EVAL_TYPE)
+  | None ->
+    if phase = EVAL_TYPE
+    then Format.fprintf out "Result: %s\n" (Typed_interpreter_with_labels.full_value_to_string resTuple);
+    resTuple
+
+
 (* --- command-line checking; dispatching to the right phase --- *)  
 
 (*exception InvalidInput of string*)
@@ -117,6 +127,11 @@ let withFlags ({phase;out;_} as config) =
       | TYPE ->
           let exp = parse config in
           let _: Ast_common.typ * Typed_ast.texp = typecheck config exp in
+          ()
+      | EVAL_TYPE ->
+          let exp = parse config in
+          let (_, texp): Ast_common.typ * Typed_ast.texp = typecheck config exp in
+          let _: Typed_interpreter_with_labels.value * Label.label * Label.label = evaluate_typed config texp in
           ()
     with ExitMain p ->
            exitCode := (error_code p)
@@ -155,7 +170,7 @@ let withFlags ({phase;out;_} as config) =
         and out = flag ~aliases:["o"] "out" 
                     (optional string) ~doc:"FILE name of output FILE"
         and phase = flag ~aliases:["p"] "phase" 
-                    (optional_with_default "eval_label" string)
+                    (optional_with_default "eval_type" string)
           ~doc:"PHASE stop compilation after PHASE:\nlex, par, eval"
           |> map ~f:(fun p -> match fromHandleOpt p with 
                                 Some p -> p 

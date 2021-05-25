@@ -1,4 +1,4 @@
-type phase = LEX | PAR | EVAL | EVAL_LABEL | TYPE
+type phase = LEX | PAR | EVAL | EVAL_LABEL | TYPE | EVAL_TYPE
 
 let toHandle = function
 | LEX -> "lex"
@@ -6,6 +6,7 @@ let toHandle = function
 | EVAL -> "eval"
 | EVAL_LABEL -> "eval_label"
 | TYPE -> "type"
+| EVAL_TYPE -> "eval_type"
 
 let fromHandleOpt = function
 | "lex" -> Some LEX
@@ -13,4 +14,5 @@ let fromHandleOpt = function
 | "eval" -> Some EVAL
 | "eval_label" -> Some EVAL_LABEL
 | "type" -> Some TYPE
+| "eval_type" -> Some EVAL_TYPE
 | _ -> None

@@ -1,0 +1,1 @@
+((n: Int) => n + 1)(if true then 41 else true)

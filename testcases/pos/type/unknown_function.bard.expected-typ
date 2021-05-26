@@ -1,0 +1,8 @@
+Any
+CallExp(
+  IfExp(
+  | BoolLit(true),
+  | LambdaExp([
+  |   (n, Int)],   |   VarExp(n)),
+  | StringLit("waaa")), [
+(  IntLit(42), true)])

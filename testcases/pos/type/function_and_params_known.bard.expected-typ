@@ -1,0 +1,9 @@
+Int
+CallExp(
+  LambdaExp([
+  | (n, Int)],   | BinOpExp(PlusBinOp,
+  |   VarExp(n),
+  |   IntLit(1),
+  |   false,
+  |   false)), [
+(  IntLit(41), false)])

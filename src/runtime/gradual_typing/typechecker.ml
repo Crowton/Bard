@@ -95,7 +95,34 @@ let rec typecheck (exp: A.exp) (tenv: tenv): (typ * T.texp) = match exp with
       let resT = if thnT = elsT then thnT else Any in
       (resT, T.IfExp { test=testTexp; thn=thnTexp; els=elsTexp; pos=pos })
 
-  (*| A.CallExp { func: exp; args: (exp * pos) list; pos: pos } *)
+  | A.CallExp { func: A.exp; args: (A.exp * pos) list; pos: pos } ->
+      let funcT, funcTexp = typecheck func tenv in
+      let argsTyped = args |> List.map (fun (arg, pos) -> (typecheck arg tenv), pos) in
+      let retType, argsStrongTyped = 
+          match funcT with
+          | FunType (paramsTypes, retType) ->
+              (if List.length paramsTypes != List.length args
+                then raise (TypeError ("Wrong number of arguments supplied at function call. " ^
+                                       "Expected " ^ string_of_int (List.length paramsTypes) ^
+                                       ", but got "^ string_of_int (List.length args) ^ ".", pos)));
+              let argsStrongTyped = List.combine argsTyped paramsTypes |> List.map (fun (((argType, arg), pos), parType) ->
+                  let checkTypeCanFail = 
+                      match (argType, parType) with
+                      | (_, Any) -> false
+                      | (Any, _) -> true
+                      | (t, t') when t = t' -> false
+                      | _ -> raise (TypeError ("Wrong type of argument. " ^
+                                               "Expected " ^ Unparser_common.unparse_typ parType ^
+                                               ", but got " ^ Unparser_common.unparse_typ argType ^ ".", pos))
+                  in
+                  (arg, checkTypeCanFail, pos)
+              ) in
+              (retType, argsStrongTyped)
+          | Any ->
+              (Any, argsTyped |> List.map (fun ((_, a), p) -> (a, true, p)))
+          | _ -> raise (TypeError ("Calling non function " ^ Unparser_common.unparse_typ funcT, pos))
+      in
+      (retType, T.CallExp { func=funcTexp; args=argsStrongTyped; pos=pos })
 
   | A.LambdaExp { params: A.fielddata list; body: A.exp; pos: pos } ->
       let tenv' = params |> List.fold_left (fun tenv' (A.Field { name: id; typean: typean; _ }) -> tenv' |> S.add name (type_of_typean typean)) tenv in

@@ -1,0 +1,6 @@
+(Bool) => Any
+LambdaExp([
+  (b, Bool)],   IfExp(
+  | VarExp(b),
+  | IntLit(1),
+  | BoolLit(true)))

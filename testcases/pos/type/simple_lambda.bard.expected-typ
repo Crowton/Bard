@@ -1,0 +1,7 @@
+(Int) => Int
+LambdaExp([
+  (n, Int)],   BinOpExp(PlusBinOp,
+  | VarExp(n),
+  | IntLit(1),
+  | false,
+  | false))

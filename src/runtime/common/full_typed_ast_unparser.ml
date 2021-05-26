@@ -34,7 +34,7 @@ let as_string typ texp =
                ]
     | LambdaExp { params: fielddata list; body: texp; _ } ->
         concat [indent d; "LambdaExp(["; dolist d field params; "], "; string_of_texp (body, d + 1); ")"]
-    | LetExp {decls; body; _} -> 
+    | LetExp {decls; body; _} ->
         concat [indent d ; "LetExp(["; dolist d dec decls; "],\n"; string_of_texp (body, d + 1); ")"]
 
   and dec (theDec,d) = match theDec with 

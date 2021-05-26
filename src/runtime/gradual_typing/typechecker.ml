@@ -95,9 +95,14 @@ let rec typecheck (exp: A.exp) (tenv: tenv): (typ * T.texp) = match exp with
       let resT = if thnT = elsT then thnT else Any in
       (resT, T.IfExp { test=testTexp; thn=thnTexp; els=elsTexp; pos=pos })
 
-  (*| A.CallExp { func: exp; args: (exp * pos) list; pos: pos }
+  (*| A.CallExp { func: exp; args: (exp * pos) list; pos: pos } *)
 
-  | A.LambdaExp { params: fielddata list ; body: exp ; pos: pos } *)
+  | A.LambdaExp { params: A.fielddata list; body: A.exp; pos: pos } ->
+      let tenv' = params |> List.fold_left (fun tenv' (A.Field { name: id; typean: typean; _ }) -> tenv' |> S.add name (type_of_typean typean)) tenv in
+      let bodyT, bodyTexp = typecheck body tenv' in
+      let paramsTypes = params |> List.map (fun (A.Field { typean: typean; _ }) -> type_of_typean typean) in
+      let params' = params |> List.map (fun (A.Field { name: id; typean: typean; pos: pos }) -> T.Field { name=name; typean=typean; pos=pos }) in
+      (FunType (paramsTypes, bodyT), T.LambdaExp { params=params'; body=bodyTexp; pos=pos })
 
   | A.LetExp { decls: A.decl list; body: A.exp; pos: pos } ->
       let tenv', decls'rev = decls |> List.fold_left (fun (tenv, declsrev) decl -> let tenv', decl' = typecheck_decl decl tenv in (tenv', decl' :: declsrev)) (tenv, []) in

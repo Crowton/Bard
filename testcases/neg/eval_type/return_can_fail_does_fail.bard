@@ -1,0 +1,5 @@
+let fun f(b: Bool): Int = (if b then 2 else "hello") raisedTo {secret}
+	val x = f(false)
+in
+	send 42
+end

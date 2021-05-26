@@ -1,0 +1,19 @@
+Unit
+LetExp([
+  FunctionDec[
+  | (f,[
+  |   (b, Bool)],
+  |   Int,
+  |   RaisedToExp(
+  |   | IfExp(
+  |   |   VarExp(b),
+  |   |   IntLit(2),
+  |   |   StringLit("hello")),
+  |   | {secret}),
+  |   true)],
+  VarDec(x, NO_TY,
+  | CallExp(
+  |   VarExp(f), [
+(  |   BoolLit(false), false)]),
+  | false)],
+  SendExp(  IntLit(42)))

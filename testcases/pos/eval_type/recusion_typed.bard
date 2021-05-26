@@ -1,0 +1,5 @@
+let fun fac(base: Int, n: Int): Int = if n == 0 then base else n * fac(base, n - 1)
+    val x = fac(1 raisedTo {secret}, 8)
+in
+	send 42
+end

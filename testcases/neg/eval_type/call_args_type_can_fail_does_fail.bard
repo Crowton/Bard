@@ -1,0 +1,6 @@
+let fun f(x: Int) = x
+    val x = (if false then 1 else true) raisedTo {secret}
+    val y = f(x)
+in
+    send 42
+end

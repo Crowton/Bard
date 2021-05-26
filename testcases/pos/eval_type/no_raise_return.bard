@@ -1,0 +1,6 @@
+let fun f(x: Int): Int = x + 1
+    val x = 41 raisedTo {the_answer}
+    val y = f(x)
+in
+    send "I know the way"
+end

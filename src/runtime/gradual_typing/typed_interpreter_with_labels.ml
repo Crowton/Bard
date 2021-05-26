@@ -13,7 +13,7 @@ type value
   | BoolVal of bool
   | StringVal of string
   | UnitVal
-  | ClosureVal of { params: fielddata list; restyp: typean; body: texp; env: env; defs: fundecldata list }
+  | ClosureVal of { params: fielddata list; restyp: typean; body: texp; rescanfail: bool; env: env; defs: fundecldata list }
 and env = (value * label) S.t
 
 
@@ -109,8 +109,8 @@ let checkValueType (value: value) (typean: typean) (pos: pos) (fName: string) : 
 (* Binding ad rebinding functions *)
 let bindDefs (defs: fundecldata list) (env: env) (label: label) : env = 
   defs |> List.fold_left (
-    fun env (Fdecl { name: id; params: fielddata list; result: typean; body: texp; _ }) ->
-      S.add name (ClosureVal { params=params; restyp=result; body=body; env=env; defs=defs }, label) env
+    fun env (Fdecl { name: id; params: fielddata list; result: typean; body: texp; rescanfail: bool; _ }) ->
+      S.add name (ClosureVal { params=params; restyp=result; body=body; rescanfail=rescanfail; env=env; defs=defs }, label) env
   ) env
 
 
@@ -187,9 +187,9 @@ let eval_top texp out =
           | (v, _, _) -> raise (InterpreterError ("Type mismatch at if condition. Expected Bool, but got " ^ type_string_of_value v ^ ".", pos))
         )
 
-    | CallExp { func: texp; args: (texp * bool * pos) list; rescanfail: bool; pos: pos } ->
+    | CallExp { func: texp; args: (texp * bool * pos) list; pos: pos } ->
         (match eval func env pc bl with
-          | (ClosureVal { params; restyp; body; env=cenv; defs }, l, bl') ->
+          | (ClosureVal { params; restyp; body; rescanfail; env=cenv; defs }, l, bl') ->
               (if List.length params != List.length args
                 then raise (InterpreterError ("Wrong number of arguments supplied at function call. " ^
                                               "Expected " ^ string_of_int (List.length params) ^
@@ -215,8 +215,8 @@ let eval_top texp out =
           | (v, _, _) -> raise (InterpreterError ("Calling non function type " ^ type_string_of_value v ^ ".", pos))
         )
 
-    | LambdaExp { params: fielddata list ; body: texp ; _ } ->
-        (ClosureVal { params=params; restyp=None; body=body; env=env; defs=[] }, pc, bl)
+    | LambdaExp { params: fielddata list; body: texp; _ } ->
+        (ClosureVal { params=params; restyp=None; body=body; rescanfail=false; env=env; defs=[] }, pc, bl)
 
     | LetExp { decls: decl list; body: texp; _ } ->
         let (env', bl') = decls |> List.fold_left (fun (env, bl) decl -> eval_decl decl env pc bl) (env, bl) in

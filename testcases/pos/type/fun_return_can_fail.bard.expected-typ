@@ -1,0 +1,11 @@
+Int
+LetExp([
+  FunctionDec[
+  | (f,[],
+  |   Int,
+  |   IfExp(
+  |   | BoolLit(true),
+  |   | IntLit(2),
+  |   | StringLit("hello")),
+  |   true)]],
+  IntLit(42))

@@ -1,0 +1,8 @@
+Int
+LetExp([
+  FunctionDec[
+  | (f,[],
+  |   Int,
+  |   IntLit(3),
+  |   false)]],
+  IntLit(42))

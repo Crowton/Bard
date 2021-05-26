@@ -31,6 +31,12 @@ let check_unop (pos: pos) (typ: typ) (demandType: typ): bool =
                             ^ Unparser_common.unparse_typ typ ^ ".", pos))
 
 
+let type_of_typean typean: typ =
+  match typean with
+  | None -> Any
+  | Some (t, _) -> t
+
+
 let rec typecheck (exp: A.exp) (tenv: tenv): (typ * T.texp) = match exp with
   | A.IntLit i -> (Int, T.IntLit i)
   | A.BoolLit i -> (Bool, T.BoolLit i)
@@ -99,7 +105,24 @@ let rec typecheck (exp: A.exp) (tenv: tenv): (typ * T.texp) = match exp with
       (bodyT, T.LetExp { decls=List.rev decls'rev; body=bodyTexp; pos=pos })
 
 and typecheck_decl (decl: A.decl) (tenv: tenv): (tenv * T.decl) = match decl with
-  (* | A.FunDec fundecldatalist -> (tenv, T.FunDec []) *)
+  | A.FunDec fundecldatalist ->
+      let tenv' = fundecldatalist |> List.fold_left (fun tenv (A.Fdecl { name: id; params: A.fielddata list; result: typean; _ }) ->
+          tenv |> S.add name (FunType (params |> List.map (fun (A.Field { typean: typean; _ }) -> type_of_typean typean), type_of_typean result))
+      ) tenv in
+      let fundecldatalist' = fundecldatalist |> List.map (fun (A.Fdecl { name: id; params: A.fielddata list; result: typean; body: A.exp; pos: pos }) ->
+          let tenv'' = params |> List.fold_left (fun tenv' (A.Field { name: id; typean: typean; _ }) -> tenv' |> S.add name (type_of_typean typean)) tenv' in
+          let bodyT, bodyTexp = typecheck body tenv'' in
+          let resCheckCanFail =
+              (match (result, bodyT) with
+               | (None, _) -> false
+               | (Some (t, _), t') when t = t' -> false
+               | (Some _, Any) -> true
+               | (Some (t, _), _) -> raise (TypeError ("Returntype at fun expected " ^ Unparser_common.unparse_typ t ^ " but got " ^ Unparser_common.unparse_typ bodyT, pos)))
+          in
+          let params' = params |> List.map (fun (A.Field { name: id; typean: typean; pos: pos }) -> T.Field { name=name; typean=typean; pos=pos }) in
+          T.Fdecl { name=name; params=params'; result=result; body=bodyTexp; rescanfail=resCheckCanFail; pos=pos }
+      ) in
+      (tenv', T.FunDec fundecldatalist')
   | A.ValDec { name: id; typean: typean; init: A.exp; pos: pos } ->
       let initT, initTexp = typecheck init tenv in
       let resTy, canfail = match typean with

@@ -1,0 +1,4 @@
+let fun f(): Int = if true then 2 else "hello"
+in
+    42
+end

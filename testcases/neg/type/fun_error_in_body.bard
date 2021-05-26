@@ -1,0 +1,4 @@
+let fun f() = true + 2
+in
+    42
+end

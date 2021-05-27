@@ -67,9 +67,7 @@ let phaseFlag phase = "-p " ^
 let inputFlag phase file =
   match phase with
   | EVAL_TYPE ->
-      print_string file;
       let filenamelen = String.length file in
-      print_int filenamelen;
       let namebase = String.sub file 0 (filenamelen - 5) in
       let infilename = namebase ^ ".in" in
       if Sys.file_exists infilename then "-i " ^ infilename else ""

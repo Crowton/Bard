@@ -3,6 +3,7 @@
 open Bardcommon
 open Bardlexer
 open Bardparser
+
 open Bardinterpreter
 open Bardtypechecker
 
@@ -10,7 +11,7 @@ open Phases
 open ExitCodes
 
 
-type config = { file: string; phase: phase; out: Format.formatter }
+type config = { file: string; phase: phase; mailbox: Mailbox.mailbox; out: Format.formatter }
 
 exception ExitMain of phase
 
@@ -93,7 +94,7 @@ let typecheck { phase; out; _ } exp =
     (resType, resExp)
 
 
-let evaluate_typed { phase; out; _ } texp =
+let evaluate_typed { phase; mailbox; out; _ } texp =
   let resTuple, err = Typed_interpreter_with_labels.eval_top texp out in
   match err with
   | Some (msg, p) -> Printf.eprintf "Exception at %d:%d: %s\n%!" p.pos_lnum (p.pos_cnum - p.pos_bol + 1) msg; raise (ExitMain EVAL_TYPE)
@@ -106,7 +107,7 @@ let evaluate_typed { phase; out; _ } texp =
 (* --- command-line checking; dispatching to the right phase --- *)  
 
 (*exception InvalidInput of string*)
-let withFlags ({phase;out;_} as config) =
+let withFlags ({ phase; out; _ } as config) =
   let exitCode = ref 0 in
   begin 
     try
@@ -167,6 +168,8 @@ let withFlags ({phase;out;_} as config) =
       ~readme: ( fun () -> "More detailed information")
       Command.Let_syntax.(        
         let%map_open file = anon ( "filename" %: regular_file)
+        and inchannel = flag ~aliases:["i"] "in" 
+                    (optional string) ~doc:"FILE name of input FILE"
         and out = flag ~aliases:["o"] "out" 
                     (optional string) ~doc:"FILE name of output FILE"
         and phase = flag ~aliases:["p"] "phase" 
@@ -178,11 +181,30 @@ let withFlags ({phase;out;_} as config) =
                                       ; exit 1
                     )
         in
-        fun () -> 
+        fun () ->
           let out = match out with 
           | None -> Format.std_formatter 
           | Some s -> Format.formatter_of_out_channel (Out_channel.create s) in
-          let config = { file; phase; out } in 
+
+          let mailbox = match inchannel with
+          | None -> Mailbox.get_empty
+          | Some s ->
+              let input = open_in s in
+              let value_list: ((Typed_interpreter_with_labels.value * Label.label) list ref) = ref [] in
+              (try
+                while true do
+                    let line = input_line input in
+                    let filebuf = Lexing.from_string line in
+                    let exp = Parser.program Lexer.token filebuf in
+                    let _, texp, _ = Typechecker.typecheck_top exp in
+                    let (value, label, _), _ = Typed_interpreter_with_labels.eval_top texp out in
+                    value_list := (value, label) :: !value_list
+                done
+              with End_of_file ->
+                close_in input);
+              Mailbox.get_init (List.rev !value_list)
+          in
+          let config = { file; phase; mailbox; out } in 
           withFlags config
       ) in
     Command.run ~version: "0.05" ~build_info: "Bard runtime" command 

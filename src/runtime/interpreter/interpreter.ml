@@ -15,15 +15,6 @@ type value
 and env = value S.t
 
 
-let value_to_string (v: value) : string = match v with
-  | IntVal i -> string_of_int i
-  | BoolVal b -> string_of_bool b
-  | StringVal s -> s
-  | UnitVal -> "unit"
-  | ClosureVal { params; restyp; body; _ } ->
-      concat ["("; unparse_paramslist params; ")"; unparse_typean restyp; " => "; unparse_exp body] 
-
-
 let typ_of_typean (t: typean) : typ = match t with
   | None -> Any
   | Some (ty, _) -> ty
@@ -38,6 +29,15 @@ let type_of_val (v: value) : typ = match v with
         params |> List.map (fun (Field { typean; _ }) -> typ_of_typean typean),
         typ_of_typean restyp
       )
+
+
+let value_to_string (v: value) : string = match v with
+  | IntVal i -> string_of_int i
+  | BoolVal b -> string_of_bool b
+  | StringVal s -> s
+  | UnitVal -> "unit"
+  | ClosureVal { params; restyp; body; _ } ->
+      concat ["("; unparse_paramslist params; ")"; unparse_typean restyp; " => "; unparse_exp body] 
 
 let type_string_of_value (v: value) : string =
   unparse_typ (type_of_val v)

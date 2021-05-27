@@ -17,18 +17,6 @@ type value
 and env = (value * label) S.t
 
 
-let value_to_string (v: value) : string = match v with
-  | IntVal i -> string_of_int i
-  | BoolVal b -> string_of_bool b
-  | StringVal s -> s
-  | UnitVal -> "unit"
-  | ClosureVal { params; restyp; body; _ } ->
-      concat ["("; unparse_paramslist params; ")"; unparse_typean restyp; " => "; unparse_texp body]
-
-let full_value_to_string (v: value * label * label) : string = match v with
-  | (value, label, bl) -> concat [value_to_string value; "@"; unparse_label label; "%"; unparse_label bl]
-
-
 let typ_of_typean (t: typean) : typ = match t with
   | None -> Any
   | Some (ty, _) -> ty
@@ -43,6 +31,31 @@ let type_of_val (v: value) : typ = match v with
         params |> List.map (fun (Field { typean; _ }) -> typ_of_typean typean),
         typ_of_typean restyp
       )
+
+
+let typ_match_value typ value: bool =
+  let valtyp = type_of_val value in
+  let rec check typ valtyp =
+    match (typ, valtyp) with
+    | (Any, _) -> true
+    | (typ, valtyp) when typ = valtyp -> true
+    | (FunType (paramtypes, rettype), FunType (valparamtypes, valrettype)) when List.length paramtypes != List.length valparamtypes ->
+        (List.combine paramtypes valparamtypes |> List.for_all (fun (typ, valtyp) -> check typ valtyp)) && check rettype valrettype
+    | _ -> false
+  in
+  check typ valtyp
+
+
+let value_to_string (v: value) : string = match v with
+  | IntVal i -> string_of_int i
+  | BoolVal b -> string_of_bool b
+  | StringVal s -> s
+  | UnitVal -> "unit"
+  | ClosureVal { params; restyp; body; _ } ->
+      concat ["("; unparse_paramslist params; ")"; unparse_typean restyp; " => "; unparse_texp body]
+
+let full_value_to_string (v: value * label * label) : string = match v with
+  | (value, label, bl) -> concat [value_to_string value; "@"; unparse_label label; "%"; unparse_label bl]
 
 let type_string_of_value (v: value) : string =
   unparse_typ (type_of_val v)

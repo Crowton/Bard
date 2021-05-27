@@ -1,0 +1,1 @@
+let fun f(x: Int): Int = x + 1 in f end

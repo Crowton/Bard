@@ -155,7 +155,7 @@ let eval_top texp mailbox out =
           else raise (InterpreterError ("Cannot send at current label.", pos))
     | ReceiveExp { typ: typean; pos: pos } ->
         if flows_to pc bot && flows_to bl bot
-          then let value, label = mailbox#get typ in
+          then let value, label = mailbox#get typ pos in
                (value, label, bl)
           else raise (InterpreterError ("Cannot receive at current label.", pos))
 

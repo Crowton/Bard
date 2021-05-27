@@ -137,6 +137,7 @@ let eval_top exp out =
         let v = eval exp env in
         Format.fprintf out "%s\n" (value_to_string v);
         UnitVal
+    | ReceiveExp { pos; _ } -> raise (InterpreterError ("Receive not supported.", pos))
     
     | BinOpExp { left: exp; oper: binOp; right: exp; pos: pos } ->
         let leftVal = eval left env in

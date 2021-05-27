@@ -71,7 +71,7 @@ we should probably do that in a on-demand manner.
 
 let defaultPhasesToCheck = 
   let open BardGolden in 
-    [ LEX; PAR; (* EVAL; EVAL_LABEL; TYPE; EVAL_TYPE *) ]
+    [ (* LEX; PAR; EVAL; EVAL_LABEL; TYPE; *) EVAL_TYPE ]
 
 
 
@@ -116,7 +116,7 @@ let () =
   let featureSetTests = [] in  (* Todo: initialize this. *)  
   let options_init:BardGolden.options = 
         {use_filter = None; overwrite = false} in 
-  let argv1,options = setOverwriteFlag Sys.argv options_init in 
+  let argv1, options = setOverwriteFlag Sys.argv options_init in 
   let argv2, tests = 
       if Array.mem flagUSEFEATURESETS argv1
       then removeFlag argv1 flagUSEFEATURESETS, featureSetTests   

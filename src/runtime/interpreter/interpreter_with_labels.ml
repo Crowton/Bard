@@ -140,6 +140,7 @@ let eval_top exp out =
           then (Format.fprintf out "%s\n" (full_value_to_string (v, l, bl'));
               (UnitVal, pc, lub bl' (lub l pc)))
           else raise (InterpreterError ("Cannot send at current label.", pos))
+    | ReceiveExp { pos; _ } -> raise (InterpreterError ("Receive not supported.", pos))
     
     | BinOpExp { left: exp; oper: binOp; right: exp; pos: pos } ->
         let leftVal, leftLabel, bl' = eval left env pc bl in

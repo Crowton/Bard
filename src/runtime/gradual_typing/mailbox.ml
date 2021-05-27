@@ -4,8 +4,6 @@ open Unparser_common
 open Label
 open Typed_interpreter_with_labels
 
-exception MailboxError of string
-
 class mailbox (init_buffer: (value * label) list) =
   object (self)
     val mutable buffer: (value * label) list = init_buffer
@@ -23,11 +21,11 @@ class mailbox (init_buffer: (value * label) list) =
               then (Some (elm, lab), tail)
               else let res, resTail = self#traverse typ tail in (res, (elm, lab) :: resTail)
 
-    method get (typ: typean): (value * label) =
+    method get (typ: typean) pos: (value * label) =
       let res, finalBuff = self#traverse typ buffer in
       match res with
       | None ->
-          raise (MailboxError ("Buffer does not contain value of type " ^ unparse_typean typ))
+          raise (InterpreterError ("Buffer does not contain value of type " ^ unparse_typean typ, pos))
       | Some elm ->
           buffer <- finalBuff;
           elm

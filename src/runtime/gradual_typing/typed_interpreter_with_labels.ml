@@ -131,7 +131,7 @@ let bindDefs (defs: fundecldata list) (env: env) (label: label) : env =
 (* Main run function.
    Initiate with empty enviroment.
    Catch errors and propegate to Main program *)
-let eval_top texp out =
+let eval_top texp mailbox out =
 
   (* Recursive evaluation function *)
   let rec eval (texp: texp) (env: env) (pc: label) (bl: label) : value * label * label = match texp with
@@ -153,7 +153,12 @@ let eval_top texp out =
           then (Format.fprintf out "%s\n" (full_value_to_string (v, l, bl'));
               (UnitVal, pc, lub bl' (lub l pc)))
           else raise (InterpreterError ("Cannot send at current label.", pos))
-    
+    | ReceiveExp { typ: typean; pos: pos } ->
+        if flows_to pc bot && flows_to bl bot
+          then let value, label = mailbox#get typ in
+               (value, label, bl)
+          else raise (InterpreterError ("Cannot receive at current label.", pos))
+
     | BinOpExp { left: texp; oper: binOp; right: texp; leftcanfail: bool; rightcanfail: bool; pos: pos } ->
         let leftVal, leftLabel, bl' = eval left env pc bl in
         let rightVal, rightLabel, bl'' = eval right env pc bl' in

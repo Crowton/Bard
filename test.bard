@@ -1,1 +1,1 @@
-send 3 + 4
+(receive: (Int) => Int)(41)

@@ -53,6 +53,8 @@ let rec typecheck (exp: A.exp) (tenv: tenv): (typ * T.texp) = match exp with
   | A.SendExp { exp: A.exp; pos: pos } ->
       let _, texp = typecheck exp tenv in
       (Unit, T.SendExp { texp=texp; pos=pos })
+  | A.ReceiveExp { typ: typean; pos: pos } ->
+      (type_of_typean typ, T.ReceiveExp { typ=typ; pos=pos })
 
   | A.BinOpExp { left: A.exp; oper: binOp; right: A.exp; pos: pos } ->
       let leftT, leftTexp = typecheck left tenv in

@@ -11,7 +11,7 @@
 %token <string> STRING
 %token COMMA COLON
 %token LPAREN RPAREN
-%token RAISEDTO LBRACE RBRACE SEND
+%token RAISEDTO LBRACE RBRACE SEND RECEIVE
 %token PLUS MINUS TIMES DIVIDE
 %token LT LE GT GE EEQ NEQ
 %token AND OR NOT
@@ -70,6 +70,8 @@ exp:
   | x=ID                                         { VarExp (x, $startpos) }
   | e=exp RAISEDTO l=level                       { RaisedToExp { exp=e; label=l; pos=$startpos } }
   | SEND e=exp                                   { SendExp { exp=e; pos=$startpos } }
+  | RECEIVE                                      { ReceiveExp { typ=None; pos=$startpos } }
+  | RECEIVE COLON typ=typ                        { ReceiveExp { typ=Some (typ, $startpos(typ)); pos=$startpos } }
   | MINUS e=exp                                  { UnOpExp { oper=NegUnOp; exp=e; pos=$startpos } }  %prec unary_minus
   | NOT e=exp                                    { UnOpExp { oper=NotUnOp; exp=e; pos=$startpos } }
   | e1=exp o=op e2=exp                           { BinOpExp { left=e1; oper=o; right=e2; pos=$startpos } }

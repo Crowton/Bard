@@ -31,6 +31,7 @@ rule token = parse
 | '}'                 { RBRACE }
 | "raisedTo"          { RAISEDTO }
 | "send"              { SEND }
+| "receive"           { RECEIVE }
 | '+'                 { PLUS }
 | '-'                 { MINUS }
 | '*'                 { TIMES }

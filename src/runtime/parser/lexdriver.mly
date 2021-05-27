@@ -12,6 +12,7 @@ anytoken:
   | RBRACE { "RBRACE" , $startpos }
   | RAISEDTO { "RAISEDTO" , $startpos }
   | SEND { "SEND" , $startpos }
+  | RECEIVE { "RECEIVE" , $startpos }
   | COMMA { "COMMA" , $startpos }
   | COLON { "COLON" , $startpos }
   | LPAREN { "LPAREN" , $startpos }

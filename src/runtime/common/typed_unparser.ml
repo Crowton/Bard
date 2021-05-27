@@ -19,7 +19,8 @@ let unparsed e0 =
     | StringLit (s, _) -> "\"" ^ (String.escaped s) ^ "\""
     | VarExp (x, _) -> x
     | RaisedToExp { texp; label; _ } -> concat [ unparse_texp (texp, d); " raisedTo "; unparse_label label ]
-    | SendExp { texp; _ } -> concat [ "Send "; unparse_texp (texp, d) ]
+    | SendExp { texp; _ } -> concat [ "send "; unparse_texp (texp, d) ]
+    | ReceiveExp { typ; _ } -> concat [ "receive "; unparse_typean typ ]
     | BinOpExp { left; oper; right; _ } -> 
         concat ["("; unparse_texp (left, d); " "; unparse_binop oper; " "; unparse_texp (right, d); ")"]
     | UnOpExp { oper; texp; _ } ->

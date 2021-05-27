@@ -1,0 +1,3 @@
+BinOpExp(PlusBinOp,
+  ReceiveExp(Int),
+  IntLit(4))

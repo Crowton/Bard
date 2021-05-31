@@ -71,7 +71,7 @@ we should probably do that in a on-demand manner.
 
 let defaultPhasesToCheck = 
   let open BardGolden in 
-    [ (* LEX; PAR; EVAL; EVAL_LABEL; TYPE; *) EVAL_TYPE ]
+    [ LEX; PAR; EVAL; EVAL_LABEL; TYPE; EVAL_TYPE ]
 
 
 

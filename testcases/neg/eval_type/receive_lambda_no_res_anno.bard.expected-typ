@@ -1,0 +1,4 @@
+Int
+CallExp(
+  ReceiveExp((Int) => Int), [
+(  IntLit(41), false)])

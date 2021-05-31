@@ -151,7 +151,7 @@ let eval_top texp mailbox out =
         let v, l, bl' = eval texp env pc bl in
         if flows_to l bot && flows_to pc bot && flows_to bl' bot
           then (Format.fprintf out "%s\n" (full_value_to_string (v, l, bl'));
-              (UnitVal, pc, lub bl' (lub l pc)))
+               (UnitVal, pc, lub bl' (lub l pc)))  (* Raising bl does nothing tho *)
           else raise (InterpreterError ("Cannot send at current label.", pos))
     | ReceiveExp { typ: typean; pos: pos } ->
         if flows_to pc bot && flows_to bl bot

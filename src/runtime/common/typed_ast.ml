@@ -12,8 +12,8 @@ type texp
   | ReceiveExp of { typ: typean; pos: pos }
   | BinOpExp of { left: texp; oper: binOp; right: texp; leftcanfail: bool; rightcanfail: bool; pos: pos }
   | UnOpExp of { oper: unOp; texp: texp; canfail: bool; pos: pos }
-  | IfExp of { test: texp; thn: texp; els: texp option; pos: pos }
-  | CallExp of { func: texp; args: (texp * bool * pos) list; pos: pos }
+  | IfExp of { test: texp; testCanFail: bool; thn: texp; els: texp option; raiseOnReturn: bool; pos: pos }
+  | CallExp of { func: texp; funcCanFail: bool; args: (texp * bool * pos) list; pos: pos }
   | LambdaExp of { params: fielddata list; body: texp; pos: pos }
   | LetExp of { decls: decl list; body: texp; pos: pos }
 and decl

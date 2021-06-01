@@ -22,13 +22,17 @@ let as_string typ texp =
         ",\n"; indent (d + 1); string_of_bool leftcanfail; ",\n"; indent (d + 1); string_of_bool rightcanfail; ")"]
     | UnOpExp { oper; texp; canfail; _ } ->
         concat [ indent d; "UnOpExp("; unopname oper; ",\n"; string_of_texp (texp, d + 1); ",\n"; indent (d + 1); string_of_bool canfail; ")"]
-    | IfExp { test; thn; els; _ }    -> 
-       concat [ indent d; "IfExp(\n"; string_of_texp (test, d + 1); ",\n"; string_of_texp (thn, d + 1);
-                (match els with None -> "" | Some e -> ",\n" ^ string_of_texp (e, d + 1)) ; ")"]
-    | CallExp { func; args; _ } ->
+    | IfExp { test; testCanFail; thn; els; raiseOnReturn; _ }    -> 
+       concat [ indent d; "IfExp(\n"; string_of_texp (test, d + 1);
+                ",\n"; indent (d + 1); string_of_bool testCanFail;
+                ",\n"; string_of_texp (thn, d + 1);
+                (match els with None -> "" | Some e -> ",\n" ^ string_of_texp (e, d + 1));
+                ",\n"; indent (d + 1); string_of_bool raiseOnReturn; ")"]
+    | CallExp { func; funcCanFail; args; _ } ->
         concat [ indent d
                ; "CallExp(\n"
                ; string_of_texp (func, d + 1)
+               ; ",\n"; indent (d + 1); string_of_bool funcCanFail; ",\n"
                ; ", ["
                ; dolist d (fun ((a, b, _), d') -> concat ["("; string_of_texp (a, d'); ", "; string_of_bool b; ")"]) args
                ; "])"

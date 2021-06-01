@@ -84,23 +84,24 @@ let rec typecheck (exp: A.exp) (tenv: tenv): (typ * T.texp) = match exp with
 
   | A.IfExp { test: A.exp; thn: A.exp; els: A.exp option; pos: pos } ->
       let testT, testTexp = typecheck test tenv in
-      (match testT with
-       | Bool | Any -> () (* Do nothing. "can fail" but label must be raised anyways *)
+      let testCanFail = match testT with
+       | Bool -> false
+       | Any -> true
        | _ -> raise (TypeError ("Condition at if expected Boolean but got " ^ Unparser_common.unparse_typ testT, pos))
-      );
+      in
       let thnT, thnTexp = typecheck thn tenv in
       let elsT, elsTexp =
           match els with
           | None -> (Unit, None)
           | Some e -> let eT, eTexp = typecheck e tenv in (eT, Some eTexp)
       in
-      let resT = if thnT = elsT then thnT else Any in
-      (resT, T.IfExp { test=testTexp; thn=thnTexp; els=elsTexp; pos=pos })
+      let resT, raiseOnReturn = if thnT = elsT then (thnT, false) else (Any, true) in
+      (resT, T.IfExp { test=testTexp; testCanFail=testCanFail; thn=thnTexp; els=elsTexp; raiseOnReturn=raiseOnReturn; pos=pos })
 
   | A.CallExp { func: A.exp; args: (A.exp * pos) list; pos: pos } ->
       let funcT, funcTexp = typecheck func tenv in
       let argsTyped = args |> List.map (fun (arg, pos) -> (typecheck arg tenv), pos) in
-      let retType, argsStrongTyped = 
+      let retType, funcCanFail, argsStrongTyped = 
           match funcT with
           | FunType (paramsTypes, retType) ->
               (if List.length paramsTypes != List.length args
@@ -119,12 +120,12 @@ let rec typecheck (exp: A.exp) (tenv: tenv): (typ * T.texp) = match exp with
                   in
                   (arg, checkTypeCanFail, pos)
               ) in
-              (retType, argsStrongTyped)
+              (retType, false, argsStrongTyped)
           | Any ->
-              (Any, argsTyped |> List.map (fun ((_, a), p) -> (a, true, p)))
+              (Any, true, argsTyped |> List.map (fun ((_, a), p) -> (a, true, p)))
           | _ -> raise (TypeError ("Calling non function " ^ Unparser_common.unparse_typ funcT, pos))
       in
-      (retType, T.CallExp { func=funcTexp; args=argsStrongTyped; pos=pos })
+      (retType, T.CallExp { func=funcTexp; funcCanFail=funcCanFail; args=argsStrongTyped; pos=pos })
 
   | A.LambdaExp { params: A.fielddata list; body: A.exp; pos: pos } ->
       let tenv' = params |> List.fold_left (fun tenv' (A.Field { name: id; typean: typean; _ }) -> tenv' |> S.add name (type_of_typean typean)) tenv in

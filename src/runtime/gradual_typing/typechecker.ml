@@ -172,9 +172,5 @@ and typecheck_decl (decl: A.decl) (tenv: tenv): (tenv * T.decl) = match decl wit
 
 
 
-let typecheck_top (exp: A.exp): (typ * T.texp * ((string * pos) option)) =
-  try
-    let t, texp = typecheck exp S.empty in
-    (t, texp, None)
-  with
-    | (TypeError (msg, pos)) -> (Int, T.IntLit (-1), Some (msg, pos))
+let typecheck_top (exp: A.exp): (typ * T.texp) =
+  typecheck exp S.empty

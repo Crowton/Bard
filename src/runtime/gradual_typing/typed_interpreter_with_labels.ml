@@ -273,6 +273,4 @@ let eval_top texp mailbox out =
   in
 
   (* Main body *)
-  try (eval texp S.empty bot bot, None)
-  with
-    | (InterpreterError (msg, pos)) -> ((UnitVal, bot, bot, bot), Some (msg, pos))
+  eval texp S.empty bot bot

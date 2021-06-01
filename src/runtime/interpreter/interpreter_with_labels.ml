@@ -232,6 +232,4 @@ let eval_top exp out =
   in
 
   (* Main body *)
-  try (eval exp S.empty bot bot, None)
-  with
-    | (InterpreterError (msg, pos)) -> ((UnitVal, bot, bot, bot), Some (msg, pos))
+  eval exp S.empty bot bot

@@ -218,7 +218,5 @@ let eval_top exp out =
   in
 
 
-(* Main eval body *)
-try (eval exp S.empty, None)
-  with
-    | (InterpreterError (msg, pos)) -> (UnitVal, Some (msg, pos))
+  (* Main eval body *)
+  eval exp S.empty

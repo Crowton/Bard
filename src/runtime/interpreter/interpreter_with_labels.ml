@@ -14,7 +14,7 @@ type value
   | StringVal of string
   | UnitVal
   | ClosureVal of { params: fielddata list; restyp: typean; body: exp; env: env; defs: fundecldata list }
-and env = (value * label) S.t
+and env = (value * label * label) S.t
 
 
 let value_to_string (v: value) : string = match v with
@@ -25,8 +25,8 @@ let value_to_string (v: value) : string = match v with
   | ClosureVal { params; restyp; body; _ } ->
       concat ["("; unparse_paramslist params; ")"; unparse_typean restyp; " => "; unparse_exp body] 
 
-let full_value_to_string (v: value * label * label) : string = match v with
-  | (value, label, bl) -> concat [value_to_string value; "@"; unparse_label label; "%"; unparse_label bl]
+let full_value_to_string (value: value) (label: label) (typelabel: label) : string = 
+  concat [value_to_string value; "@"; unparse_label label; "%"; unparse_label typelabel]
 
 
 let typ_of_typean (t: typean) : typ = match t with
@@ -106,11 +106,11 @@ let checkValueType (value: value) (typean: typean) (pos: pos) (fName: string) : 
                                       ^ unparse_typ realTy ^ ".", pos))
 
 
-(* Binding ad rebinding functions *)
+(* Binding and rebinding functions *)
 let bindDefs (defs: fundecldata list) (env: env) (label: label) : env = 
   defs |> List.fold_left (
     fun env (Fdecl { name: id; params: fielddata list; result: typean; body: exp; _ }) ->
-      S.add name (ClosureVal { params=params; restyp=result; body=body; env=env; defs=defs }, label) env
+      S.add name (ClosureVal { params=params; restyp=result; body=body; env=env; defs=defs }, label, bot) env
   ) env
 
 
@@ -121,100 +121,96 @@ let bindDefs (defs: fundecldata list) (env: env) (label: label) : env =
 let eval_top exp out =
 
   (* Recursive evalueation function *)
-  let rec eval (exp: exp) (env: env) (pc: label) (bl: label) : value * label * label = match exp with
-    | IntLit i -> (IntVal i, pc, bl)
-    | BoolLit b -> (BoolVal b, pc, bl)
-    | StringLit (s, _) -> (StringVal s, pc, bl)
+  let rec eval (exp: exp) (env: env) (pc: label) (bl: label) : value * label * label * label = match exp with
+    | IntLit i -> (IntVal i, pc, bot, bl)
+    | BoolLit b -> (BoolVal b, pc, bot, bl)
+    | StringLit (s, _) -> (StringVal s, pc, bot, bl)
     | VarExp (x, p) ->
         (match env |> S.find_opt x with
           | None -> raise (InterpreterError ("Unbound Identifier " ^ x, p))
-          | Some (v, l) -> (v, l, bl)
+          | Some (v, l, tl) -> (v, l, tl, bl)
         )
     
     | RaisedToExp { exp: exp; label: label; _ } ->
-        let v, baseLabel, bl' = eval exp env pc bl in
-        (v, lub baseLabel label, bl')
+        let v, baseLabel, basetypelabel, bl' = eval exp env pc bl in
+        (v, lub baseLabel label, basetypelabel, bl')
     | SendExp { exp: exp; pos: pos } ->
-        let v, l, bl' = eval exp env pc bl in
-        if flows_to l bot && flows_to pc bot && flows_to bl' bot
-          then (Format.fprintf out "%s\n" (full_value_to_string (v, l, bl'));
-              (UnitVal, pc, lub bl' (lub l pc)))
+        let v, l, lt, bl' = eval exp env pc bl in
+        if flows_to l bot && flows_to lt bot && flows_to pc bot && flows_to bl' bot
+          then (Format.fprintf out "%s\n" (full_value_to_string v l lt);
+              (UnitVal, pc, bot, bl'))
           else raise (InterpreterError ("Cannot send at current label.", pos))
     | ReceiveExp { pos; _ } -> raise (InterpreterError ("Receive not supported.", pos))
     
     | BinOpExp { left: exp; oper: binOp; right: exp; pos: pos } ->
-        let leftVal, leftLabel, bl' = eval left env pc bl in
-        let rightVal, rightLabel, bl'' = eval right env pc bl' in
+        let leftVal, leftLabel, leftTypeLabel, bl' = eval left env pc bl in
+        let rightVal, rightLabel, rightTypeLabel, bl'' = eval right env pc bl' in
         let int_eval = eval_binop_int leftVal rightVal pos in
         let int_bool_eval = eval_binop_int_to_bool leftVal rightVal pos in
         let bool_eval = eval_binop_bool leftVal rightVal pos in
         let string_eval = eval_binop_string leftVal rightVal pos in
-        let resVal = match oper with
-          | PlusBinOp -> int_eval (+) "Plus"
-          | MinusBinOp -> int_eval (-) "Minus"
-          | TimesBinOp -> int_eval ( * ) "Times"
-          | DivideBinOp -> if rightVal = IntVal 0 then raise (InterpreterError ("ZeroDivisionError", pos)); int_eval (/) "Divide"
-          | LtBinOp -> int_bool_eval (<) "Less"
-          | LeBinOp -> int_bool_eval (<=) "Less equals"
-          | GtBinOp -> int_bool_eval (>) "Greater"
-          | GeBinOp -> int_bool_eval (>=) "Greater equals"
-          | EqBinOp -> int_bool_eval (=) "Equals"
-          | NeqBinOp -> int_bool_eval (<>) "Not equals"
-          | AndBinOp -> bool_eval (&&) "And"
-          | OrBinOp -> bool_eval (||) "Or"
-          | ConcatBinOp -> string_eval (^) "Concatenation"
+        let resVal, extraRaise = match oper with
+          | PlusBinOp -> int_eval (+) "Plus", bot
+          | MinusBinOp -> int_eval (-) "Minus", bot
+          | TimesBinOp -> int_eval ( * ) "Times", bot
+          | DivideBinOp -> if rightVal = IntVal 0 then raise (InterpreterError ("ZeroDivisionError", pos)); int_eval (/) "Divide", rightLabel
+          | LtBinOp -> int_bool_eval (<) "Less", bot
+          | LeBinOp -> int_bool_eval (<=) "Less equals", bot
+          | GtBinOp -> int_bool_eval (>) "Greater", bot
+          | GeBinOp -> int_bool_eval (>=) "Greater equals", bot
+          | EqBinOp -> int_bool_eval (=) "Equals", bot
+          | NeqBinOp -> int_bool_eval (<>) "Not equals", bot
+          | AndBinOp -> bool_eval (&&) "And", bot
+          | OrBinOp -> bool_eval (||) "Or", bot
+          | ConcatBinOp -> string_eval (^) "Concatenation", bot
         in
         let resLabel = lub leftLabel rightLabel in
-        (resVal, resLabel, lub bl'' resLabel)
+        let resTypeLabel = lub leftTypeLabel rightTypeLabel in
+        (resVal, resLabel, resTypeLabel, lub (lub bl'' resTypeLabel) extraRaise)
     | UnOpExp { oper: unOp; exp: exp; pos: pos } ->
-        let expVal, expLabel, bl' = eval exp env pc bl in
+        let expVal, expLabel, expTypeLabel, bl' = eval exp env pc bl in
         let resVal = match oper with
           | NegUnOp -> eval_unop_int expVal pos (~-) "Negation"
           | NotUnOp -> eval_unop_bool expVal pos (not) "Not"
         in
-        (resVal, expLabel, lub bl' expLabel)
+        (resVal, expLabel, expTypeLabel, lub bl' expTypeLabel)
     
     | IfExp { test: exp; thn: exp; els: exp option; pos: pos } ->
-        (match eval test env pc bl with
-          | (BoolVal true, l, bl') -> eval thn env (lub pc l) (lub bl' l)
-          | (BoolVal false, l, bl') ->
+        let testVal, testLabel, testTypeLabel, bl' = eval test env pc bl in
+        let newPc, newBl = lub pc testLabel, lub bl' testTypeLabel in
+        let resVal, resLabel, resTypeLabel, bl'' = match testVal with
+          | BoolVal true -> eval thn env newPc newBl
+          | BoolVal false ->
               (match els with
-                | None -> (UnitVal, lub pc l, (lub bl' l))
-                | Some el -> eval el env (lub pc l) (lub bl' l)
+                | None -> (UnitVal, newPc, bot, newBl)
+                | Some el -> eval el env newPc newBl
               )
-          | (v, _, _) -> raise (InterpreterError ("Type mismatch at if condition. Expected Bool, but got " ^ type_string_of_value v ^ ".", pos))
-        )
+          | v -> raise (InterpreterError ("Type mismatch at if condition. Expected Bool, but got " ^ type_string_of_value v ^ ".", pos))
+        in
+        (resVal, resLabel, lub resTypeLabel testLabel, lub bl'' testLabel)
 
     | CallExp { func: exp; args: (exp * pos) list; pos: pos } ->
         (match eval func env pc bl with
-          | (ClosureVal { params; restyp; body; env=cenv; defs }, l, bl') ->
+          | (ClosureVal { params; restyp; body; env=cenv; defs }, l, lt, bl') ->
               (if List.length params != List.length args
                 then raise (InterpreterError ("Wrong number of arguments supplied at function call. " ^
                                               "Expected " ^ string_of_int (List.length params) ^
                                               ", but got "^ string_of_int (List.length args) ^ ".", pos)));
               let env', bl'' = List.combine args params |> List.fold_left (
                   fun (env', bl') ((exp, pos), Field { name; typean; _ }) ->
-                    let res, resLabel, bl'' = eval exp env pc bl' in
+                    let res, resLabel, resTypeLabel, bl'' = eval exp env pc bl' in
                     checkValueType res typean pos "function argument";
-                    let resBl = match typean with
-                      | None -> bl''
-                      | Some _ -> lub bl'' resLabel
-                    in
-                    (S.add name (res, lub resLabel l) env', resBl)
-                  ) (cenv, lub bl' l) in
+                    (S.add name (res, lub resLabel l, resTypeLabel) env', lub bl'' resTypeLabel)
+                  ) (cenv, lub bl' lt) in
               let env'' = bindDefs defs env' l in
-              let res, resLabel, bl''' = eval body env'' (lub pc l) bl'' in
+              let res, resLabel, resTypeLabel, bl''' = eval body env'' (lub pc l) bl'' in
               checkValueType res restyp pos "function return value";
-              let resBl = match restyp with
-                | None -> bl'''
-                | Some _ -> lub bl''' resLabel
-              in
-              (res, resLabel, resBl)
-          | (v, _, _) -> raise (InterpreterError ("Calling non function type " ^ type_string_of_value v ^ ".", pos))
+              (res, resLabel, resTypeLabel, lub bl''' resTypeLabel)
+          | (v, _, _, _) -> raise (InterpreterError ("Calling non function type " ^ type_string_of_value v ^ ".", pos))
         )
 
     | LambdaExp { params: fielddata list ; body: exp ; _ } ->
-        (ClosureVal { params=params; restyp=None; body=body; env=env; defs=[] }, pc, bl)
+        (ClosureVal { params=params; restyp=None; body=body; env=env; defs=[] }, pc, bot, bl)
 
     | LetExp { decls: decl list; body: exp; _ } ->
         let (env', bl') = decls |> List.fold_left (fun (env, bl) decl -> eval_decl decl env pc bl) (env, bl) in
@@ -225,17 +221,17 @@ let eval_top exp out =
     | FunDec defs ->
         (bindDefs defs env pc, bl)
     | ValDec { name: id; typean: typean; init: exp; pos: pos } ->
-        let res, resLabel, bl' = eval init env pc bl in
+        let res, resLabel, resTypeLabel, bl' = eval init env pc bl in
         checkValueType res typean pos "ValDecl";
         let resBl = match typean with
           | None -> bl'
-          | Some _ -> lub bl' resLabel
+          | Some _ -> lub bl' resTypeLabel
         in
-        (S.add name (res, resLabel) env, resBl)
+        (S.add name (res, resLabel, resTypeLabel) env, resBl)
 
   in
 
   (* Main body *)
   try (eval exp S.empty bot bot, None)
   with
-    | (InterpreterError (msg, pos)) -> ((UnitVal, bot, bot), Some (msg, pos))
+    | (InterpreterError (msg, pos)) -> ((UnitVal, bot, bot, bot), Some (msg, pos))

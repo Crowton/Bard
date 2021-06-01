@@ -75,13 +75,14 @@ let evaluate { phase; out; _ } exp =
     res
 
 let evaluate_label { phase; out; _ } exp =
-  let resTuple, err = Interpreter_with_labels.eval_top exp out in
+  let (resVal, resLabel, resTypeLabel, bl), err = Interpreter_with_labels.eval_top exp out in
   match err with
   | Some (msg, p) -> Printf.eprintf "Exception at %d:%d: %s\n%!" p.pos_lnum (p.pos_cnum - p.pos_bol + 1) msg; raise (ExitMain EVAL_LABEL)
   | None ->
     if phase = EVAL_LABEL
-    then Format.fprintf out "Result: %s\n" (Interpreter_with_labels.full_value_to_string resTuple);
-    resTuple
+    then (Format.fprintf out "Result: %s\n" (Interpreter_with_labels.full_value_to_string resVal resLabel resTypeLabel);
+          Format.fprintf out "Blocking Label: %s\n" (Unparser_common.unparse_label bl));
+    (resVal, resLabel, resTypeLabel)
 
 
 let typecheck { phase; out; _ } exp =

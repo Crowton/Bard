@@ -96,13 +96,14 @@ let typecheck { phase; out; _ } exp =
 
 
 let evaluate_typed { phase; mailbox; out; _ } texp =
-  let resTuple, err = Typed_interpreter_with_labels.eval_top texp mailbox out in
+  let (resVal, resLabel, resTypeLabel, bl), err = Typed_interpreter_with_labels.eval_top texp mailbox out in
   match err with
   | Some (msg, p) -> Printf.eprintf "Exception at %d:%d: %s\n%!" p.pos_lnum (p.pos_cnum - p.pos_bol + 1) msg; raise (ExitMain EVAL_TYPE)
   | None ->
     if phase = EVAL_TYPE
-    then Format.fprintf out "Result: %s\n" (Typed_interpreter_with_labels.full_value_to_string resTuple);
-    resTuple
+    then (Format.fprintf out "Result: %s\n" (Typed_interpreter_with_labels.full_value_to_string resVal resLabel resTypeLabel);
+          Format.fprintf out "Blocking Label: %s\n" (Unparser_common.unparse_label bl));
+    (resVal, resLabel, resTypeLabel)
 
 
 (* --- command-line checking; dispatching to the right phase --- *)  
@@ -191,15 +192,15 @@ let withFlags ({ phase; out; _ } as config) =
           | None -> Mailbox.get_empty
           | Some s ->
               let input = open_in s in
-              let value_list: ((Typed_interpreter_with_labels.value * Label.label) list ref) = ref [] in
+              let value_list: ((Typed_interpreter_with_labels.value * Label.label * Label.label) list ref) = ref [] in
               (try
                 while true do
                     let line = input_line input in
                     let filebuf = Lexing.from_string line in
                     let exp = Parser.program Lexer.token filebuf in
                     let _, texp, _ = Typechecker.typecheck_top exp in
-                    let (value, label, _), _ = Typed_interpreter_with_labels.eval_top texp Mailbox.get_empty out in
-                    value_list := (value, label) :: !value_list
+                    let (value, label, typeLabel, _), _ = Typed_interpreter_with_labels.eval_top texp Mailbox.get_empty out in
+                    value_list := (value, label, typeLabel) :: !value_list
                 done
               with End_of_file ->
                 close_in input);

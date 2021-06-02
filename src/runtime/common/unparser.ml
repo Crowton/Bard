@@ -20,6 +20,7 @@ let unparsed e0 =
     | RaisedToExp { exp; label; _ } -> concat [ unparse_exp (exp, d); " raisedTo "; unparse_label label ]
     | SendExp { exp; _ } -> concat [ "send "; unparse_exp (exp, d) ]
     | ReceiveExp { typ; _ } -> concat [ "receive "; unparse_typean typ ]
+    | BlockDeclExp { label; _ } -> concat [ "blockDecl "; unparse_label label ]
     | BinOpExp { left; oper; right; _ } -> 
         concat ["("; unparse_exp (left, d); " "; unparse_binop oper; " "; unparse_exp (right, d); ")"]
     | UnOpExp { oper; exp; _ } ->

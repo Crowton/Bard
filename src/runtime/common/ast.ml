@@ -10,6 +10,7 @@ type exp
   | RaisedToExp of { exp: exp; label: label; pos: pos }
   | SendExp of { exp: exp; pos: pos }
   | ReceiveExp of { typ: typean; pos: pos }
+  | BlockDeclExp of { label: label; pos: pos }
   | BinOpExp of { left: exp; oper: binOp; right: exp; pos: pos }
   | UnOpExp of { oper: unOp; exp: exp; pos: pos }
   | IfExp of { test: exp; thn: exp; els: exp option; pos: pos }

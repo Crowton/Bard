@@ -17,6 +17,7 @@ let as_string e0 =
     | RaisedToExp { exp; label; _ } -> concat [ indent d; "RaisedToExp(\n"; string_of_exp (exp, d + 1); ",\n"; indent (d + 1); string_of_label label; ")" ]
     | SendExp { exp; _ } -> concat [indent d; "SendExp("; string_of_exp (exp, d); ")"]
     | ReceiveExp { typ; _ } -> concat [indent d; "ReceiveExp("; string_of_typean typ; ")"]
+    | BlockDeclExp { label; _ } -> concat [indent d; "BlockDeclExp("; string_of_label label; ")"]
     | BinOpExp { left; oper; right; _ } ->
         concat [ indent d; "BinOpExp("; binopname oper; ",\n"; string_of_exp (left, d + 1); ",\n"; string_of_exp (right, d + 1); ")"]
     | UnOpExp { oper; exp; _ } ->

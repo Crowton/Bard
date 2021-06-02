@@ -32,6 +32,7 @@ rule token = parse
 | "raisedTo"          { RAISEDTO }
 | "send"              { SEND }
 | "receive"           { RECEIVE }
+| "blockDecl"         { BLOCKDECL }
 | '+'                 { PLUS }
 | '-'                 { MINUS }
 | '*'                 { TIMES }

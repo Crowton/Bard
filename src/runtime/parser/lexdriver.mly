@@ -13,6 +13,7 @@ anytoken:
   | RAISEDTO { "RAISEDTO" , $startpos }
   | SEND { "SEND" , $startpos }
   | RECEIVE { "RECEIVE" , $startpos }
+  | BLOCKDECL { "BLOCKDECL" , $startpos }
   | COMMA { "COMMA" , $startpos }
   | COLON { "COLON" , $startpos }
   | LPAREN { "LPAREN" , $startpos }

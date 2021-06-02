@@ -159,6 +159,10 @@ let eval_top exp mailbox out =
           then let value, label, typeLabel = mailbox#get typ pos in
                (value, label, typeLabel, bl)
           else raise (InterpreterError ("Cannot receive at current label.", pos))
+    | BlockDeclExp { label; pos } ->
+        if flows_to pc label && flows_to bl label
+          then (UnitVal, pc, bot, pc)
+          else raise (InterpreterError ("Cannot declassify at current label.", pos))
     
     | BinOpExp { left: exp; oper: binOp; right: exp; pos: pos } ->
         let leftVal, leftLabel, leftTypeLabel, bl' = eval left env pc bl in

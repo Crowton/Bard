@@ -1,0 +1,7 @@
+let val a = (receive: Bool) raisedTo {alice}
+    val b = if a then 10 else 20
+    val c = b + 1
+    val _ = blockDecl {alice}
+in
+    send 42
+end

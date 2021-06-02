@@ -1,0 +1,23 @@
+Unit
+LetExp([
+  VarDec(a, NO_TY,
+  | RaisedToExp(
+  |   ReceiveExp(Bool),
+  |   {alice}),
+  | false),
+  VarDec(b, NO_TY,
+  | IfExp(
+  |   VarExp(a),
+  |   false,
+  |   IntLit(10),
+  |   IntLit(20),
+  |   false),
+  | false),
+  VarDec(c, NO_TY,
+  | BinOpExp(PlusBinOp,
+  |   VarExp(b),
+  |   IntLit(1),
+  |   false,
+  |   false),
+  | false)],
+  SendExp(  IntLit(42)))

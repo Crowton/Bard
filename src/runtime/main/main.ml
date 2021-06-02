@@ -11,7 +11,10 @@ open Phases
 open ExitCodes
 
 
-type config = { file: string; phase: phase; mailbox: Mailbox.mailbox; out: Format.formatter }
+type config = { file: string; phase: phase;
+                mailbox: Mailbox_with_labels.mailbox;
+                typed_mailbox: Typed_mailbox_with_labels.mailbox;
+                out: Format.formatter }
 
 exception ExitMain of phase
 
@@ -74,9 +77,9 @@ let evaluate { phase; out; _ } exp =
   with
   | Interpreter.InterpreterError (msg, p) -> Printf.eprintf "Exception at %d:%d: %s\n%!" p.pos_lnum (p.pos_cnum - p.pos_bol + 1) msg; raise (ExitMain EVAL)
 
-let evaluate_label { phase; out; _ } exp =
+let evaluate_label { phase; mailbox; out; _ } exp =
   try
-    let resVal, resLabel, resTypeLabel, bl = Interpreter_with_labels.eval_top exp out in
+    let resVal, resLabel, resTypeLabel, bl = Interpreter_with_labels.eval_top exp mailbox out in
     if phase = EVAL_LABEL
     then (Format.fprintf out "Result: %s\n" (Interpreter_with_labels.full_value_to_string resVal resLabel resTypeLabel);
           Format.fprintf out "Blocking Label: %s\n" (Unparser_common.unparse_label bl));
@@ -95,9 +98,9 @@ let typecheck { phase; out; _ } exp =
   | Typechecker.TypeError (msg, p) -> Printf.eprintf "Exception at %d:%d: %s\n%!" p.pos_lnum (p.pos_cnum - p.pos_bol + 1) msg; raise (ExitMain TYPE)
 
 
-let evaluate_typed { phase; mailbox; out; _ } texp =
+let evaluate_typed { phase; typed_mailbox; out; _ } texp =
   try
-    let resVal, resLabel, resTypeLabel, bl = Typed_interpreter_with_labels.eval_top texp mailbox out in
+    let resVal, resLabel, resTypeLabel, bl = Typed_interpreter_with_labels.eval_top texp typed_mailbox out in
     if phase = EVAL_TYPE
     then (Format.fprintf out "Result: %s\n" (Typed_interpreter_with_labels.full_value_to_string resVal resLabel resTypeLabel);
           Format.fprintf out "Blocking Label: %s\n" (Unparser_common.unparse_label bl));
@@ -153,6 +156,42 @@ let withFlags ({ phase; out; _ } as config) =
      Observe that this part relies on ppx_jane extension.
   *)
 
+  let get_mailbox phase file out = match phase with
+    | EVAL_LABEL ->
+        let input = open_in file in
+        let value_list: ((Interpreter_with_labels.value * Label.label * Label.label) list ref) = ref [] in
+        (try
+          while true do
+              let line = input_line input in
+              let filebuf = Lexing.from_string line in
+              let exp = Parser.program Lexer.token filebuf in
+              let value, label, typeLabel, _ = Interpreter_with_labels.eval_top exp Mailbox_with_labels.get_empty out in
+              value_list := (value, label, typeLabel) :: !value_list
+          done
+        with End_of_file ->
+          close_in input);
+        Mailbox_with_labels.get_init (List.rev !value_list)
+    | _ -> Mailbox_with_labels.get_empty
+  
+  let get_typed_mailbox phase file out = match phase with
+    | EVAL_TYPE ->
+        let input = open_in file in
+        let value_list: ((Typed_interpreter_with_labels.value * Label.label * Label.label) list ref) = ref [] in
+        (try
+          while true do
+              let line = input_line input in
+              let filebuf = Lexing.from_string line in
+              let exp = Parser.program Lexer.token filebuf in
+              let _, texp = Typechecker.typecheck_top exp in
+              let value, label, typeLabel, _ = Typed_interpreter_with_labels.eval_top texp Typed_mailbox_with_labels.get_empty out in
+              value_list := (value, label, typeLabel) :: !value_list
+          done
+        with End_of_file ->
+          close_in input);
+        Typed_mailbox_with_labels.get_init (List.rev !value_list)
+    | _ -> Typed_mailbox_with_labels.get_empty
+
+
   let main () = 
     let open Core in
 
@@ -188,25 +227,12 @@ let withFlags ({ phase; out; _ } as config) =
           | None -> Format.std_formatter 
           | Some s -> Format.formatter_of_out_channel (Out_channel.create s) in
 
-          let mailbox = match inchannel with
-          | None -> Mailbox.get_empty
-          | Some s ->
-              let input = open_in s in
-              let value_list: ((Typed_interpreter_with_labels.value * Label.label * Label.label) list ref) = ref [] in
-              (try
-                while true do
-                    let line = input_line input in
-                    let filebuf = Lexing.from_string line in
-                    let exp = Parser.program Lexer.token filebuf in
-                    let _, texp = Typechecker.typecheck_top exp in
-                    let value, label, typeLabel, _ = Typed_interpreter_with_labels.eval_top texp Mailbox.get_empty out in
-                    value_list := (value, label, typeLabel) :: !value_list
-                done
-              with End_of_file ->
-                close_in input);
-              Mailbox.get_init (List.rev !value_list)
+          let mailbox, typed_mailbox = match inchannel with
+          | None -> Mailbox_with_labels.get_empty, Typed_mailbox_with_labels.get_empty
+          | Some s -> get_mailbox phase s out, get_typed_mailbox phase s out
           in
-          let config = { file; phase; mailbox; out } in 
+
+          let config = { file; phase; mailbox; typed_mailbox; out } in 
           withFlags config
       ) in
     Command.run ~version: "0.05" ~build_info: "Bard runtime" command 

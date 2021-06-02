@@ -44,6 +44,20 @@ let type_of_val (v: value) : typ = match v with
         typ_of_typean restyp
       )
 
+
+let typ_match_value typ value: bool =
+  let valtyp = type_of_val value in
+  let rec check typ valtyp =
+    match (typ, valtyp) with
+    | (Any, _) -> true
+    | (typ, valtyp) when typ = valtyp -> true
+    | (FunType (paramtypes, rettype), FunType (valparamtypes, valrettype)) when List.length paramtypes != List.length valparamtypes ->
+        (List.combine paramtypes valparamtypes |> List.for_all (fun (typ, valtyp) -> check typ valtyp)) && check rettype valrettype
+    | _ -> false
+  in
+  check typ valtyp
+
+
 let type_string_of_value (v: value) : string =
   unparse_typ (type_of_val v)
 
@@ -118,7 +132,7 @@ let bindDefs (defs: fundecldata list) (env: env) (label: label) : env =
 (* Main run function.
    Initiate with empty enviroment.
    Catch errors and propegate to Main program *)
-let eval_top exp out =
+let eval_top exp mailbox out =
 
   (* Recursive evalueation function *)
   let rec eval (exp: exp) (env: env) (pc: label) (bl: label) : value * label * label * label = match exp with
@@ -140,7 +154,11 @@ let eval_top exp out =
           then (Format.fprintf out "%s\n" (full_value_to_string v l lt);
               (UnitVal, pc, bot, bl'))
           else raise (InterpreterError ("Cannot send at current label.", pos))
-    | ReceiveExp { pos; _ } -> raise (InterpreterError ("Receive not supported.", pos))
+    | ReceiveExp { typ; pos; } ->
+        if flows_to pc bot && flows_to bl bot
+          then let value, label, typeLabel = mailbox#get typ pos in
+               (value, label, typeLabel, bl)
+          else raise (InterpreterError ("Cannot receive at current label.", pos))
     
     | BinOpExp { left: exp; oper: binOp; right: exp; pos: pos } ->
         let leftVal, leftLabel, leftTypeLabel, bl' = eval left env pc bl in

@@ -64,18 +64,15 @@ let phaseFlag phase = "-p " ^
   match phase with 
    LEX -> "lex" | PAR -> "par" | EVAL -> "eval" | EVAL_LABEL -> "eval_label" | TYPE -> "type" | EVAL_TYPE -> "eval_type"
 
-let inputFlag phase file =
-  match phase with
-  | EVAL_TYPE ->
-      let filenamelen = String.length file in
-      let namebase = String.sub file 0 (filenamelen - 5) in
-      let infilename = namebase ^ ".in" in
-      if Sys.file_exists infilename then "-i " ^ infilename else ""
-  | _ -> ""
+let inputFlag file =
+  let filenamelen = String.length file in
+  let namebase = String.sub file 0 (filenamelen - 5) in
+  let infilename = namebase ^ ".in" in
+  if Sys.file_exists infilename then "-i " ^ infilename else ""
 
 (* observe that if the exit code is non-zero we make no further checks *)  
 let goldenWithExitCode expectedExitCode phase overwrite file () = 
-  let flag = " " ^ phaseFlag phase ^ " " ^ inputFlag phase file in
+  let flag = " " ^ phaseFlag phase ^ " " ^ inputFlag file in
   let status, out = runWithStatus @@"./testwrap.sh " ^ file ^ flag in 
   match status with 
   | Unix.WEXITED 0 when expectedExitCode = 0  ->

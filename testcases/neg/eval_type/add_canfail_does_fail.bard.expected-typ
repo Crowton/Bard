@@ -5,7 +5,9 @@ BinOpExp(PlusBinOp,
   | {secret}),
   IfExp(
   | BoolLit(false),
+  | false,
   | IntLit(21),
-  | StringLit("world")),
+  | StringLit("world"),
+  | true),
   false,
   true)

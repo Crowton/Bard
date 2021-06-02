@@ -5,7 +5,9 @@ LetExp([
   |   Int,
   |   IfExp(
   |   | BoolLit(true),
+  |   | false,
   |   | IntLit(2),
-  |   | StringLit("hello")),
+  |   | StringLit("hello"),
+  |   | true),
   |   true)]],
   IntLit(42))

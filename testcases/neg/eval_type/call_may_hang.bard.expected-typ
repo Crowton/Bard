@@ -13,7 +13,9 @@ LetExp([
   | false),
   VarDec(x, NO_TY,
   | CallExp(
-  |   VarExp(g), [
+  |   VarExp(g),
+  |   false,
+, [
 (  |   IntLit(1), false)]),
   | false)],
   SendExp(  IntLit(42)))

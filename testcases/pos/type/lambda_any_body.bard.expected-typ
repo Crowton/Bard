@@ -2,5 +2,7 @@
 LambdaExp([
   (b, Bool)],   IfExp(
   | VarExp(b),
+  | false,
   | IntLit(1),
-  | BoolLit(true)))
+  | BoolLit(true),
+  | true))

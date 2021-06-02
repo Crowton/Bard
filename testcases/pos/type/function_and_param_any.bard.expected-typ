@@ -5,8 +5,12 @@ CallExp(
   |   VarExp(n),
   |   IntLit(1),
   |   false,
-  |   false)), [
+  |   false)),
+  false,
+, [
 (  IfExp(
   | BoolLit(true),
+  | false,
   | IntLit(41),
-  | BoolLit(true)), true)])
+  | BoolLit(true),
+  | true), true)])

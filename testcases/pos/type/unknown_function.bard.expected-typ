@@ -2,7 +2,11 @@ Any
 CallExp(
   IfExp(
   | BoolLit(true),
+  | false,
   | LambdaExp([
   |   (n, Int)],   |   VarExp(n)),
-  | StringLit("waaa")), [
+  | StringLit("waaa"),
+  | true),
+  true,
+, [
 (  IntLit(42), true)])

@@ -1,4 +1,6 @@
 Int
 CallExp(
-  ReceiveExp((Int) => Int), [
+  ReceiveExp((Int) => Int),
+  false,
+, [
 (  IntLit(41), false)])

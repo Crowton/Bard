@@ -1,4 +1,0 @@
-let val x: Int = 20 raisedTo {secret}
-in
-    send "welp. This should fail"
-end

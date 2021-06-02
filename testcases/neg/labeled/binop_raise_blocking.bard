@@ -1,5 +1,0 @@
-let val x = 3 raisedTo {secret}
-    val y = x + 8
-in
-    send true
-end

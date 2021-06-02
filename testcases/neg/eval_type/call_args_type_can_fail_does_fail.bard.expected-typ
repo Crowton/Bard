@@ -10,13 +10,17 @@ LetExp([
   | RaisedToExp(
   |   IfExp(
   |   | BoolLit(false),
+  |   | false,
   |   | IntLit(1),
-  |   | BoolLit(true)),
+  |   | BoolLit(true),
+  |   | true),
   |   {secret}),
   | false),
   VarDec(y, NO_TY,
   | CallExp(
-  |   VarExp(f), [
+  |   VarExp(f),
+  |   false,
+, [
 (  |   VarExp(x), true)]),
   | false)],
   SendExp(  IntLit(42)))

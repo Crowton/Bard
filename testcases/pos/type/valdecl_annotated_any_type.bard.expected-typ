@@ -3,8 +3,10 @@ LetExp([
   VarDec(x, Int,
   | IfExp(
   |   BoolLit(true),
+  |   false,
   |   IntLit(10),
-  |   StringLit("hello")),
+  |   StringLit("hello"),
+  |   true),
   | true)],
   BinOpExp(PlusBinOp,
   | VarExp(x),

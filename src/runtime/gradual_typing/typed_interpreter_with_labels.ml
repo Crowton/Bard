@@ -246,7 +246,7 @@ let eval_top texp mailbox out =
                 | Some _ -> bot
               in
               let resRaiseTypeFlagLabel = flagLabel resTypeLabel rescanfail in
-              (res, resLabel, resTypeFlagLabel, lub bl''' resRaiseTypeFlagLabel)
+              (res, resLabel, resTypeFlagLabel, lub (lub bl''' l) resRaiseTypeFlagLabel)
           | (v, _, _, _) -> raise (InterpreterError ("Calling non function type " ^ type_string_of_value v ^ ".", pos))
         )
 

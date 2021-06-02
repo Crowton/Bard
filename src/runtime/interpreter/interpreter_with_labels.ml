@@ -205,7 +205,7 @@ let eval_top exp out =
               let env'' = bindDefs defs env' l in
               let res, resLabel, resTypeLabel, bl''' = eval body env'' (lub pc l) bl'' in
               checkValueType res restyp pos "function return value";
-              (res, resLabel, resTypeLabel, lub bl''' resTypeLabel)
+              (res, resLabel, resTypeLabel, lub (lub bl''' l) resTypeLabel)
           | (v, _, _, _) -> raise (InterpreterError ("Calling non function type " ^ type_string_of_value v ^ ".", pos))
         )
 

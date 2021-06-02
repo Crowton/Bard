@@ -4,8 +4,10 @@ LetExp([
   | RaisedToExp(
   |   IfExp(
   |   | BoolLit(true),
+  |   | false,
   |   | StringLit("world"),
-  |   | IntLit(21)),
+  |   | IntLit(21),
+  |   | true),
   |   {secret}),
   | true)],
   SendExp(  StringLit("hello")))

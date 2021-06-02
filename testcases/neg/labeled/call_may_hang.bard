@@ -1,0 +1,6 @@
+let fun f(x: Int): Int = x
+    val g = f raisedTo {secret}
+    val x = g(1)
+in
+    send 42
+end

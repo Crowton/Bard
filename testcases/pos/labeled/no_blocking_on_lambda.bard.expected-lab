@@ -1,1 +1,2 @@
 Result: (n: Int) => (n + 1)@{  }%{  }
+Blocking Label: {  }

@@ -1,5 +1,7 @@
 Int
 IfExp(
   BoolLit(true),
+  false,
   IntLit(1),
-  IntLit(2))
+  IntLit(2),
+  false)

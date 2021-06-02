@@ -1,8 +1,4 @@
-(**************************************************************************)
-(* AU Compilation.                                                        *)
-(**************************************************************************)
-
-type diff = {test_name:string; phase_name: string; lines: string list}
+type diff = { test_name: string; phase_name: string; lines: string list }
 
 let diffs_rev = ref ([]: diff list)
 

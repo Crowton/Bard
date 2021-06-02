@@ -1,5 +1,7 @@
 Int
 CallExp(
   LambdaExp([
-  | (n, NO_TY)],   | IntLit(42)), [
+  | (n, NO_TY)],   | IntLit(42)),
+  false,
+, [
 (  StringLit("ged"), false)])

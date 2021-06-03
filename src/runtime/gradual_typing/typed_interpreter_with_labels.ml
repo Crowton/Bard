@@ -160,12 +160,12 @@ let eval_top texp mailbox out =
           else raise (InterpreterError ("Cannot send at current label.", pos))
     | ReceiveExp { typ: typean; pos: pos } ->
         if flows_to pc bot && flows_to bl bot
-          then let value, label, typeLabel = mailbox#get typ pos in
-               let resTypeLabel = match typ with
-                   | None -> typeLabel
-                   | Some _ -> bot
+          then let (value, label, typeLabel), raiseBy = mailbox#get typ pos in
+               let resTypeLabel, actualRaiseBy = match typ with
+                   | None -> typeLabel, bot
+                   | Some _ -> bot, raiseBy
                in
-               (value, label, resTypeLabel, bl)
+               (value, label, resTypeLabel, lub bl actualRaiseBy)
           else raise (InterpreterError ("Cannot receive at current label.", pos))
 
     | BinOpExp { left: texp; oper: binOp; right: texp; leftcanfail: bool; rightcanfail: bool; pos: pos } ->

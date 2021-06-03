@@ -13,22 +13,23 @@ class mailbox (init_buffer: (value * label * label) list) =
       | None -> true
       | Some (t, _) -> typ_match_value t elm
 
-    method traverse typ inter_buff: ((value * label * label) option * (value * label * label) list) =
+    method traverse typ inter_buff: ((value * label * label) option * label * (value * label * label) list) =
         match inter_buff with
-        | [] -> (None, [])
+        | [] -> (None, bot, [])
         | (elm, lab, typLab) :: tail ->
             if self#strong_typematcher typ elm
-              then (Some (elm, lab, typLab), tail)
-              else let res, resTail = self#traverse typ tail in (res, (elm, lab, typLab) :: resTail)
+              then (Some (elm, lab, typLab), typLab, tail)
+              else let res, typeLabels, resTail = self#traverse typ tail in
+                   (res, lub typeLabels typLab, (elm, lab, typLab) :: resTail)
 
-    method get (typ: typean) pos: (value * label * label) =
-      let res, finalBuff = self#traverse typ buffer in
+    method get (typ: typean) pos: (value * label * label) * label =
+      let res, typeLabels, finalBuff = self#traverse typ buffer in
       match res with
       | None ->
           raise (InterpreterError ("Buffer does not contain value of type " ^ unparse_typean typ, pos))
       | Some elm ->
           buffer <- finalBuff;
-          elm
+          elm, typeLabels
   end
 
 

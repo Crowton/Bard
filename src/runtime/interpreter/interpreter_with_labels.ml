@@ -156,8 +156,12 @@ let eval_top exp mailbox out =
           else raise (InterpreterError ("Cannot send at current label.", pos))
     | ReceiveExp { typ; pos; } ->
         if flows_to pc bot && flows_to bl bot
-          then let value, label, typeLabel = mailbox#get typ pos in
-               (value, label, typeLabel, bl)
+          then let (value, label, typeLabel), raiseBy = mailbox#get typ pos in
+               let actualRaiseBy = match typ with
+                   | None -> bot
+                   | Some _ -> raiseBy
+               in
+               (value, label, typeLabel, lub bl actualRaiseBy)
           else raise (InterpreterError ("Cannot receive at current label.", pos))
     | BlockDeclExp { label; pos } ->
         if flows_to pc label && flows_to bl label

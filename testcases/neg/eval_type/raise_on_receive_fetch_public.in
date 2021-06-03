@@ -1,0 +1,3 @@
+if (false raisedTo {secret}) then 8 else false
+1
+2
